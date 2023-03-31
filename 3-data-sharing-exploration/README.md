@@ -37,10 +37,10 @@ such infrastructure this could be a good option. Another case is where the Data
 Provider offers pre-built logic that the Data consumer could take advantage
 from.
 
-# Table of Contents
+# Contents
 
 - [Enterprise Data Sharing - Data Exploration](#enterprise-data-sharing---data-exploration)
-- [Table of Contents](#table-of-contents)
+- [Contents](#contents)
   - [About the Sample](#about-the-sample)
   - [Deployment](#deployment)
   - [Data Transfer](#data-transfer)
@@ -70,6 +70,7 @@ from.
   - [Issues and Workarounds](#issues-and-workarounds)
     - [Please register/re-register subscription xxxx with Microsoft.Purview resource provider.](#please-registerre-register-subscription-xxxx-with-microsoftpurview-resource-provider)
     - [Resource providers Microsoft.Storage and Microsoft.EventHub are not registered for subscription.](#resource-providers-microsoftstorage-and-microsofteventhub-are-not-registered-for-subscription)
+  - [Removing the sample assets](#removing-the-sample-assets)
 
 ## About the Sample
 
@@ -401,25 +402,25 @@ content looks as follow and is stored in Key Vault under "securityFile" name.
 
  ```json
 {
-  "security_groups": "[AADGReds100LOW,AADGReds100MED,AADGReds100HIG]",
+  "security_groups": "[<AADGR<PROJECT_NAME><DEPLOYMENT_ID>LOW,AADGR<PROJECT_NAME><DEPLOYMENT_ID>MED,AADGR<PROJECT_NAME><DEPLOYMENT_ID>HIG]",
   "rules": [
     {
       "constraints": {
         "sensitivity": "Low"
       },
-      "security_group": "AADGReds100LOW"
+      "security_group": "AADGR<PROJECT_NAME><DEPLOYMENT_ID>LOW"
     },
     {
       "constraints": {
         "sensitivity": "Medium"
       },
-      "security_group": "AADGReds100MED"
+      "security_group": "AADGR<PROJECT_NAME><DEPLOYMENT_ID>MED"
     },
     {
       "constraints": {
         "sensitivity": "High"
       },
-      "security_group": "AADGReds100HIG"
+      "security_group": "AADGR<PROJECT_NAME><DEPLOYMENT_ID>HIG"
     }
   ]
 }
@@ -506,3 +507,16 @@ The used subscription must have the Microsoft.Purview provider registered.
 
 The used subscription must have the Microsoft.EventHub and Microsoft.Storage
 registered.
+
+## Removing the sample assets
+
+You can clean up all the assets and avoid additional costs by deleting the main resource group:
+
+```bash
+az group delete --resource-group <PROJECT_NAME><DEPLOYMENT_ID>-rg
+```
+and remove the AAD groups deployed:
+the aad groups: 
+- AADGR<PROJECT_NAME><DEPLOYMENT_ID>_LOW
+- AADGR<PROJECT_NAME><DEPLOYMENT_ID>_MEDIUM
+- AADGR<PROJECT_NAME><DEPLOYMENT_ID>_HIGH
