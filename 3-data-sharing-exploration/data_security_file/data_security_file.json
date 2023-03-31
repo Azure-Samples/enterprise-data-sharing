@@ -1,0 +1,27 @@
+{
+  "security_groups": [
+    "AADGReb003LOW2",
+    "AADGReb003MED",
+    "AADGReb003HIG"
+  ],
+  "rules": [
+    {
+      "constraints": {
+        "sensitivity": "Low"
+      },
+      "security_group": "AADGReb003LOW"
+    },
+    {
+      "constraints": {
+        "sensitivity": "Medium"
+      },
+      "security_group": "AADGReb003MED"
+    },
+    {
+      "constraints": {
+        "sensitivity": "High"
+      },
+      "security_group": "AADGReb003HIG"
+    }
+  ]
+}

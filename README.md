@@ -6,9 +6,9 @@
 
 This project framework provides the following features:
 
-* Feature 1
-* Feature 2
-* ...
+* [Data Market place (coming soon)](./1-data-marketplace/)
+* [Data Sharing mechanism](./2-data-sharing-mechanism/)
+* [Data Sharing Exploration](./3-data-sharing-exploration/)
 
 ## Getting Started
 
