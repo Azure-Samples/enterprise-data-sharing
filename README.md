@@ -1,57 +1,25 @@
-# Project Name
+# Enterprise Data Sharing
 
-(short, 1-3 sentenced, description of the project)
+Data is the foundation for every organization to thrive, optimize and profit within its own domain of expertise, therefore there is a common need to be able to share data in a secure and governed way to internal audiences, external customers, and partners. This sample implements three main pillars of an Enterprise Data Sharing Solution that can be used together or individually.
 
-## Features
+![Enterprise Data Sharing](./images/eds-repo-main.drawio.svg)
 
-This project framework provides the following features:
+## Modules
 
-* [Data Market place (coming soon)](./1-data-marketplace/)
-* [Data Sharing mechanism](./2-data-sharing-mechanism/)
-* [Data Sharing Exploration](./3-data-sharing-exploration/)
+This project framework provides the following modules that can be used together or individually:
+
+* [Enterprise Data Sharing - Data Market place (coming soon)](./1-data-marketplace/README.md)
+* [Enterprise Data Sharing - Data Sharing Mechanism](./2-data-sharing-mechanism/README.md/#enterprise-data-sharing---data-sharing-mechanism)
+* [Enterprise Data Sharing - Data Exploration](./3-data-sharing-exploration/README.md/#enterprise-data-sharing---data-exploration)
 
 ## Getting Started
 
-### Prerequisites
+To get started, select the functionality scope that is interesting to explore.
+At the moment of this write up, samples 2 and 3 are fully implemented and operational and the functionality can be combined or used individually.
 
-(ideally very short, if any)
+### Prerequisites and deployment
 
-- OS
-- Library version
-- ...
+For full overview on pre-requisites and how to deploy and use each sample please refer to each individual sample README.md files:
 
-### Installation
-
-(ideally very short)
-
-- npm install [package name]
-- mvn install
-- ...
-
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [repository name]
-3. ...
-
-
-## Demo
-
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+- [Data Sharing Mechanism](./2-data-sharing-mechanism/README.md/#working-with-the-sample)
+- [Data Exploration](./3-data-sharing-exploration/README.md/#about-the-sample)

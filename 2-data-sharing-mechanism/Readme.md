@@ -1,4 +1,4 @@
-# Data Sharing Mechanism
+# Enterprise Data Sharing - Data Sharing Mechanism
 
 This sample is the second sample of the Enterprise Data Sharing series and it
 implements the Data Sharing end-to-end functionality. The Data Sharing mechanism
@@ -12,7 +12,7 @@ The scope of the the sample is highlighted in red in the following architecture:
 
 ## Contents
 
-- [Data Sharing Mechanism](#data-sharing-mechanism)
+- [Enterprise Data Sharing - Data Sharing Mechanism](#enterprise-data-sharing---data-sharing-mechanism)
   - [Contents](#contents)
   - [About the sample](#about-the-sample)
   - [Working with the sample](#working-with-the-sample)

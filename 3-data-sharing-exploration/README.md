@@ -516,7 +516,6 @@ You can clean up all the assets and avoid additional costs by deleting the main 
 az group delete --resource-group <PROJECT_NAME><DEPLOYMENT_ID>-rg
 ```
 and remove the AAD groups deployed:
-the aad groups: 
 - AADGR<PROJECT_NAME><DEPLOYMENT_ID>_LOW
 - AADGR<PROJECT_NAME><DEPLOYMENT_ID>_MEDIUM
 - AADGR<PROJECT_NAME><DEPLOYMENT_ID>_HIGH
