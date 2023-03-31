@@ -43,7 +43,7 @@ The scope of the the sample is highlighted in red in the following architecture:
 
 ## About the sample
 
-[Azure Data Share](https://azure.microsoft.com/en-us/services/data-share/) setup
+[Azure Data Share](https://azure.microsoft.com/services/data-share/) setup
 requires a number of steps to establish the connection between the source data
 and the destination. One of those steps is sending an invitation from a source
 data share account and accepting the invitation in a destination data share
