@@ -22,4 +22,4 @@ At the moment of this write up, samples 2 and 3 are fully implemented and operat
 For full overview on pre-requisites and how to deploy and use each sample please refer to each individual sample README.md files:
 
 - [Data Sharing Mechanism](./2-data-sharing-mechanism/README.md/#working-with-the-sample)
-- [Data Exploration](./3-data-sharing-exploration/README.md/#about-the-sample)
+- [Data Exploration](./3-data-sharing-exploration/README.md/#deployment)
