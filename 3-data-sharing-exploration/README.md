@@ -17,8 +17,7 @@ The scope of the the sample is highlighted in red in the following architecture:
 
 The IaC deployment is included as part of the sample, plus the exploration
 functionality in python that iterates with Microsoft Purview, Azure Synapse
-Analytics, Azure KeyVault and Azure Data Lake Gen 2 as mentioned above as
-represented below:
+Analytics, Azure KeyVault and Azure Data Lake Gen 2 as represented below:
 
 ![Data Exploration Detail](./images/eds-repo-data-exploration.drawio.svg)
 
@@ -77,13 +76,13 @@ from.
 The Data Exploration sample intent is provide the Data consumer a way to explore
 and govern data previously shared by a data sharing mechanism. The sample was
 written to be modularized so individual pieces can be orchestrated and reused as
-needed. However in the sample they need to follow a particular order as they are
-some dependencies between the modules in the behavior that is demonstrated.
+needed. However in the sample they need to follow a particular order as there
+are some dependencies between the modules in the behavior that is demonstrated.
 
 The order is as follows:
 - Deployment (bash and bicep)
-- [Optional] Data Transfer (python) available
-  [here]((https://github.com/Azure-Samples/modern-data-warehouse-dataops/tree/main/single_tech_samples/datashare))
+- *Optional* Data Transfer (python) available
+  [here](https://github.com/Azure-Samples/modern-data-warehouse-dataops/tree/main/single_tech_samples/datashare)
 - Initial Setup (python)
 - Data Ingest (python)
 - Data Catalog (python)
@@ -127,7 +126,8 @@ Analytics for:
   - **AAD Security Groups** in order to take advantage of AAD Security Groups
     for different data access levels, these AAD security groups need to be
     mapped to security logins and db users in Synapse so that the access is
-    aligned accordingly.
+    aligned accordingly. The 3 Security groups are created at the time of the
+    deployment and they are used by default on the Security basic module.
  
 ## Data Ingestion
 
@@ -296,8 +296,9 @@ az login --tenant <TENANT_ID>
 az account set -s <SUBSCRIPTION_ID>
 ```
 And run the setup proceed with the following commands: 
-``` cd src 
-initial_setup.py
+```cli
+cd src 
+python initial_setup.py
 ```
 
 ### Initial Setup considerations
@@ -327,7 +328,7 @@ To run the Data Ingest module confirm that:
 
 And run the following command:
 
-`data_ingest.py`
+`python data_ingest.py`
 
 ### Data Ingest considerations
 
@@ -353,7 +354,7 @@ To run the Data Catalog module confirm that:
 
 And run the following command:
   
-`data_catalog.py`
+`python data_catalog.py`
 
 ### Data catalog considerations
 
@@ -392,7 +393,7 @@ To run the Security model basic module confirm that:
 The simpler version, which uses three static Security Groups created at
 deployment time can be ran using the following command: 
 
-  `data_security_basic.py`
+  `python data_security_basic.py`
 
 #### Advanced
 
@@ -450,7 +451,7 @@ To run the Data Catalog module confirm that:
   
   And run the following command:
 
-  `data_security_advanced.py`
+  `python data_security_advanced.py`
 
 ### Data Security model considerations
 
@@ -510,7 +511,8 @@ registered.
 
 ## Removing the sample assets
 
-You can clean up all the assets and avoid additional costs by deleting the main resource group:
+You can clean up all the assets and avoid additional costs by deleting the main
+resource group:
 
 ```bash
 az group delete --resource-group <PROJECT_NAME><DEPLOYMENT_ID>-rg
