@@ -25,9 +25,8 @@ The present sample can be used individually or in combination with the other
 parts of the series: 
  - eds-data-marketplace: that could replace the IaC module from the current
    sample.
- - eds-data-sharing-mechanism: fully automated core functionality of a [Data
-  Share
-  mechanism](https://github.com/Azure-Samples/modern-data-warehouse-dataops/tree/main/single_tech_samples/datashare)
+ - eds-data-sharing-mechanism: fully automated core functionality of a 
+[Data Share mechanism](../2-data-sharing-mechanism/Readme.md)
 
 Provisioning and orchestrating a Data Exploration infrastructure might not be
 mandatory. Data consumers could bring their own analytics tools. However, in
@@ -82,7 +81,7 @@ are some dependencies between the modules in the behavior that is demonstrated.
 The order is as follows:
 - Deployment (bash and bicep)
 - *Optional* Data Transfer (python) available
-  [here](https://github.com/Azure-Samples/modern-data-warehouse-dataops/tree/main/single_tech_samples/datashare)
+  [here](../2-data-sharing-mechanism/Readme.md)
 - Initial Setup (python)
 - Data Ingest (python)
 - Data Catalog (python)
