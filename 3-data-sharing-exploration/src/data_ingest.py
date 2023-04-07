@@ -18,7 +18,7 @@ def main():
     # setting up synapse access
     synapse = SqlHelper(config)
 
-    container = config.container_name
+    container = config.adls_container_name
     # listing metadata files
     metadata_files = storage.get_metadata_files(container)
     found = len(metadata_files)
@@ -27,7 +27,8 @@ def main():
     # create all views
     for metadata_file in metadata_files:
         synapse.create_views_from_metadata(
-            metadata_as_json=metadata_file.metadata_json, schema=config.schema_name
+            metadata_as_json=metadata_file.metadata_json,
+            schema=config.synapse_database_schema,
         )
 
     # test that views have been created
