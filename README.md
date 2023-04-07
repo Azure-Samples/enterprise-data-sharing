@@ -14,7 +14,7 @@ This project framework provides the following modules that can be used together
 or individually:
 
 * [Enterprise Data Sharing - Data Market place (coming soon)](./1-data-marketplace/README.md)
-* [Enterprise Data Sharing - Data Sharing Mechanism](./2-data-sharing-mechanism/README.md)
+* [Enterprise Data Sharing - Data Sharing Mechanism](./2-data-sharing-mechanism/Readme.md)
 * [Enterprise Data Sharing - Data Exploration](./3-data-sharing-exploration/README.md)
 
 ## Getting Started

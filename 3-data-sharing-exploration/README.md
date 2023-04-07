@@ -244,9 +244,8 @@ command:
 ```bash
 az login --tenant <TENANT_ID>
 az account set -s <SUBSCRIPTION_ID>
-cd src
-chmod +x ./deploy.sh
-set -a && source /src/.env && bash ./deploy.sh 
+chmod +x ./deploy.sh # NOTE: you might need to use sudo if you don't have enough permissions
+set -a && source ./src/.env && bash ./deploy.sh 
 ```
 ### Deployment considerations
 
