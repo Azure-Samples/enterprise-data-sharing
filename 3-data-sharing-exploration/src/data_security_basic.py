@@ -1,7 +1,6 @@
 import logging
 
 from helpers.config import Configuration
-from helpers.const import CONST
 from helpers.datasecurity.data_security_common import DataSecurityCommon
 from helpers.datasecurity.data_security_storage import DataSecurityStorage
 from helpers.datasecurity.data_security_synapse import DataSecuritySynapse
@@ -22,7 +21,7 @@ def main():
     data_security = DataSecurityCommon(config)
     data_security_storage = DataSecurityStorage(config)
     data_security_synapse = DataSecuritySynapse(config)
-    container = config.container_name
+    container = config.adls_container_name
 
     security_attribute = data_security.get_data_security_attribute()
     print(f"Attribute used to apply security: {security_attribute}")
@@ -41,8 +40,8 @@ def main():
         # 2 . Get the value of all views' security attributes from Purview
         assigned_security_groups = data_security.get_security_for_views(
             metadata_as_json=metadata_file.metadata_json,
-            m_attribute_group=CONST.MANAGED_ATTRIBUTE_GROUP,
-            m_attribute_name=CONST.SECURITY_GROUP_MANAGED_ATTRIBUTE_NAME,
+            m_attribute_group=config.security_managed_attribute_group,
+            m_attribute_name=config.security_managed_attribute_name,
         )
         print("Security Groups assigned to Views retrieved from from Purview.")
         print(assigned_security_groups)

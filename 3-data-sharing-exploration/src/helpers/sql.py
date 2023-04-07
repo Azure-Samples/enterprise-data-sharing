@@ -38,7 +38,8 @@ class SqlHelper:
         """
 
         driver = self._configuration.synapse_driver
-        synapse_server = self._configuration.synapse_server
+        synapse_workspace = self._configuration.synapse_workspace_name
+        synapse_server = f"{synapse_workspace}-ondemand.sql.azuresynapse.net"
         database_name = self._database
         credentials = AzureCliCredential()
         db_token = credentials.get_token("https://database.windows.net/.default")
@@ -81,7 +82,8 @@ class SqlHelper:
             return self._cursor
 
         driver = self._configuration.synapse_driver
-        synapse_server = self._configuration.synapse_server
+        synapse_workspace = self._configuration.synapse_workspace_name
+        synapse_server = f"{synapse_workspace}-ondemand.sql.azuresynapse.net"
         database_name = self._database
 
         username = self._configuration.azure_client_id
@@ -269,14 +271,14 @@ class SqlHelper:
         """
         metadata = Metadata.from_json(metadata_as_json)  # type: ignore
 
-        # create External Data Source
+        # Create External Data Source
         external_datasource_name = self.create_external_data_source(
-            container_name=self._configuration.container_name,
+            container_name=self._configuration.adls_container_name,
             path=metadata.path,
             schema=schema,
         )
 
-        # create Views (and schema) based on the metadata file
+        # Create Views (and schema) based on the metadata file
         for table in metadata.tables:
             self.logger.info(
                 f"Creating view {table.name} on data source {external_datasource_name}"
