@@ -8,6 +8,7 @@ from msgraph.core import GraphClient
 
 from ..config import Configuration
 from ..storage import StorageHelper
+from ..keyvault.client import ClientHelper
 from .data_security_common import DataSecurityCommon
 
 
@@ -75,16 +76,11 @@ class DataSecurityStorage:
                 security_groups_acl[group_name] = acl
             else:
                 self.logger.warning(
-                    f"AD Group {group_name} not found - using static env variable"
+                    f"AD Group {group_name} not found - using variables from keyvault."
                 )
-                # temp solution: get AD Groups object ids from env file
-                match group_name:
-                    case "Security_Group_A":
-                        env_group_id = self._configuration.security_group_a_oid
-                    case "Security_Group_B":
-                        env_group_id = self._configuration.security_group_b_oid
-                    case "Security_Group_C":
-                        env_group_id = self._configuration.security_group_c_oid
+                keyvault_client = ClientHelper(config=self._configuration)
+                objid_secret_name = f"{self._configuration.objid_prefix}-{group_name}"
+                env_group_id = keyvault_client.get_secret(secret_name=objid_secret_name)
                 acl = f"group:{env_group_id}:r-x"
                 security_groups_acl[group_name] = acl
 
@@ -154,29 +150,27 @@ class DataSecurityStorage:
         Apply ACL to all views based on the assigned security group(s)
         """
         # get the schema form env variable just to compose the folder
-        schema = self._configuration.schema_name
+        schema = self._configuration.synapse_database_schema
 
         for view in assigned_security_groups.keys():
             group = assigned_security_groups.get(view)
             # if the value is a string, then we apply ACL to a single group
             if isinstance(group, str):
+                print(f"Applying ACL - {group} should have access to {view}")
                 self.apply_acl_to_view_recursively(
                     path_to_view_dir=f"{container}/{path_to_views}",
                     view_dir=f"{schema}_{view}",
                     acl=security_groups_acls.get(group),
                 )
-                self.logger.info(f"Assigned ACL: {group} has access to {view}")
-                print(f"Assigned ACL: {group} has access to {view}")
             # if the value is a list, then we apply ACL to all groups.
             else:
                 for item in group:
+                    print(f"Applying ACL - {item} should have access to {view}")
                     self.apply_acl_to_view_recursively(
                         path_to_view_dir=f"{container}/{path_to_views}",
                         view_dir=f"{schema}_{view}",
                         acl=security_groups_acls.get(item),
                     )
-                    self.logger.info(f"Assigned ACL: {item} has access to {view}")
-                    print(f"Assigned ACL: {item} has access to {view}")
 
     def apply_acl_to_parent_directories(
         self,
