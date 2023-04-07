@@ -19,9 +19,9 @@ def main():
     synapse = SqlHelper(config, database="master", use_cli_credentials=True)
 
     # Existing Service Principal - using fixed name just for test.
-    synapse.create_login("eds-sp-nunos")
+    synapse.create_login(config.azure_client_name)
     synapse.create_database(config.synapse_database)
-    synapse.create_db_user(user_name="eds-sp-nunos", role="db_owner")
+    synapse.create_db_user(user_name=config.azure_client_name, role="db_owner")
 
     print("Login and DB User for Service Principal have been created.")
 

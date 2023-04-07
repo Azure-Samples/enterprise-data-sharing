@@ -2,159 +2,132 @@ import logging
 import os
 
 from dotenv import load_dotenv
+from azure.keyvault.secrets import SecretClient
+from azure.identity import DefaultAzureCredential
+from azure.core.exceptions import (
+    HttpResponseError,
+    ResourceNotFoundError,
+    ServiceRequestError,
+)
 
 
 class Configuration:
     def __init__(self, configuration_file: str = ".env"):
         self._logger = logging.getLogger(__name__)
 
-        self._purview_account_name = ""
-        self._purview_collection_name = ""
-        self._storage_account_name = ""
-        self._synapse_workspace_name = ""
-        self._synapse_resource_group_name = ""
-        self._synapse_subscription_id = ""
-        self._synapse_region = ""
-        self._container_name = ""
+        # from env variables
+        self._azure_location = ""
+        self._azure_subscription_id = ""
+        self._project = ""
+        self._deployment_id = ""
         self._synapse_driver = ""
-        self._synapse_server = ""
         self._synapse_database = ""
-        self._schema_name = ""
-        self._azure_client_id = ""
-        self._azure_client_secret = ""
+        self._synapse_database_schema = ""
+        self._adls_container_name = ""
+        self._purview_collection_name = ""
         self._data_security_attribute = ""
-        self._azure_tenant_id = ""
-        self._azure_keyvault_uri = ""
-        self._azure_keyvault_secret = ""
+        self._security_managed_attribute_group = ""
+        self._security_managed_attribute_name = ""
+
+        self._objid_prefix = ""
+
+        # built from env variables
+        self._synapse_workspace_name = ""
+        self._resource_group_name = ""
+        self._storage_account_name = ""
+        self._purview_account_name = ""
+        self._keyvault_name = ""
         self._data_security_group_low = ""
         self._data_security_group_medium = ""
         self._data_security_group_high = ""
-        self._security_group_a_oid = ""
-        self._security_group_b_oid = ""
-        self._security_group_c_oid = ""
+
+        # from  keyvault
+        self._azure_client_id = ""
+        self._azure_tenant_id = ""
+        self._azure_client_secret = ""
+        self._azure_client_name = ""
+        self._security_file_secret = ""
 
         self._logger.info(f"Initializing config using values in {configuration_file}")
-        if not load_dotenv(configuration_file):
-            self._logger.warning(f"{configuration_file} not found!")
+        if not load_dotenv(configuration_file, override=True):
+            self._logger.error(f"{configuration_file} not found!")
+
+        self._keyvault_client = ""
+
+    # From env
 
     @property
-    def purview_account_name(self):
-        if self._purview_account_name == "":
-            value = os.getenv("PURVIEW_ACCOUNT_NAME")
+    def azure_location(self):
+        if self._azure_location == "":
+            value = os.getenv("AZURE_LOCATION")
             if value is None:
-                self._logger.warning("PURVIEW_ACCOUNT_NAME is not set")
+                msg = "AZURE_LOCATION is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._purview_account_name = value
-        return self._purview_account_name
+                self._azure_location = value
+        return self._azure_location
 
-    @purview_account_name.setter
-    def purview_account_name(self, value):
-        self._purview_account_name = value
+    @azure_location.setter
+    def azure_location(self, value):
+        self._azure_location = value
 
     @property
-    def purview_collection_name(self):
-        if self._purview_collection_name == "":
-            value = os.getenv("PURVIEW_COLLECTION_NAME")
+    def azure_subscription_id(self):
+        if self._azure_subscription_id == "":
+            value = os.getenv("AZURE_SUBSCRIPTION_ID")
             if value is None:
-                self._logger.warning("PURVIEW_COLLECTION_NAME is not set")
+                msg = "AZURE_SUBSCRIPTION_ID is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._purview_collection_name = value
-        return self._purview_collection_name
+                self._azure_subscription_id = value
+        return self._azure_subscription_id
 
-    @purview_collection_name.setter
-    def purview_collection_name(self, value):
-        self._purview_collection_name = value
+    @azure_subscription_id.setter
+    def azure_subscription_id(self, value):
+        self._azure_subscription_id = value
 
     @property
-    def storage_account_name(self):
-        if self._storage_account_name == "":
-            value = os.getenv("STORAGE_ACCOUNT_NAME", "")
+    def project(self):
+        if self._project == "":
+            value = os.getenv("PROJECT")
             if value is None:
-                self._logger.warning("STORAGE_ACCOUNT_NAME is not set")
+                msg = "PROJECT is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._storage_account_name = value
-        return self._storage_account_name
+                self._project = value
+        return self._project
 
-    @storage_account_name.setter
-    def storage_account_name(self, value):
-        self._storage_account_name = value
+    @project.setter
+    def project(self, value):
+        self._project = value
 
     @property
-    def synapse_workspace_name(self):
-        if self._synapse_workspace_name == "":
-            value = os.getenv("SYNAPSE_WORKSPACE_NAME", "")
+    def deployment_id(self):
+        if self._deployment_id == "":
+            value = os.getenv("DEPLOYMENT_ID")
             if value is None:
-                self._logger.warning("SYNAPSE_WORKSPACE_NAME is not set")
+                msg = "DEPLOYMENT_ID is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._synapse_workspace_name = value
-        return self._synapse_workspace_name
+                self._deployment_id = value
+        return self._deployment_id
 
-    @synapse_workspace_name.setter
-    def synapse_workspace_name(self, value):
-        self._synapse_workspace_name = value
-
-    @property
-    def synapse_resource_group_name(self):
-        if self._synapse_resource_group_name == "":
-            value = os.getenv("SYNAPSE_RESOURCE_GROUP_NAME", "")
-            if value is None:
-                self._logger.warning("SYNAPSE_RESOURCE_GROUP_NAME is not set")
-            else:
-                self._synapse_resource_group_name = value
-        return self._synapse_resource_group_name
-
-    @synapse_resource_group_name.setter
-    def synapse_resource_group_name(self, value):
-        self._synapse_resource_group_name = value
-
-    @property
-    def synapse_subscription_id(self):
-        if self._synapse_subscription_id == "":
-            value = os.getenv("SYNAPSE_SUBSCRIPTION_ID", "")
-            if value is None:
-                self._logger.warning("SYNAPSE_SUBSCRIPTION_ID is not set")
-            else:
-                self._synapse_subscription_id = value
-        return self._synapse_subscription_id
-
-    @synapse_subscription_id.setter
-    def synapse_subscription_id(self, value):
-        self._synapse_subscription_id = value
-
-    @property
-    def synapse_region(self):
-        if self._synapse_region == "":
-            value = os.getenv("SYNAPSE_REGION", "")
-            if value is None:
-                self._logger.warning("SYNAPSE_REGION is not set")
-            else:
-                self._synapse_region = value
-        return self._synapse_region
-
-    @synapse_region.setter
-    def synapse_region(self, value):
-        self._synapse_region = value
-
-    @property
-    def container_name(self):
-        if self._container_name == "":
-            value = os.getenv("CONTAINER_NAME", "")
-            if value is None:
-                self._logger.warning("CONTAINER_NAME is not set")
-            else:
-                self._container_name = value
-        return self._container_name
-
-    @container_name.setter
-    def container_name(self, value):
-        self._container_name = value
+    @deployment_id.setter
+    def deployment_id(self, value):
+        self._deployment_id = value
 
     @property
     def synapse_driver(self):
         if self._synapse_driver == "":
             value = os.getenv("SYNAPSE_DRIVER", "")
             if value is None:
-                self._logger.warning("SYNAPSE_DRIVER is not set")
+                msg = "SYNAPSE_DRIVER is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
                 self._synapse_driver = value
         return self._synapse_driver
@@ -164,25 +137,13 @@ class Configuration:
         self._synapse_driver = value
 
     @property
-    def synapse_server(self):
-        if self._synapse_server == "":
-            value = os.getenv("SYNAPSE_SERVER", "")
-            if value is None:
-                self._logger.warning("SYNAPSE_SERVER is not set")
-            else:
-                self._synapse_server = value
-        return self._synapse_server
-
-    @synapse_server.setter
-    def synapse_server(self, value):
-        self._synapse_server = value
-
-    @property
     def synapse_database(self):
         if self._synapse_database == "":
             value = os.getenv("SYNAPSE_DATABASE", "")
             if value is None:
-                self._logger.warning("SYNAPSE_DATABASE is not set")
+                msg = "SYNAPSE_DATABASE is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
                 self._synapse_database = value
         return self._synapse_database
@@ -192,67 +153,61 @@ class Configuration:
         self._synapse_database = value
 
     @property
-    def schema_name(self):
-        if self._schema_name == "":
-            value = os.getenv("SCHEMA_NAME", "")
+    def synapse_database_schema(self):
+        if self._synapse_database_schema == "":
+            value = os.getenv("SYNAPSE_DATABASE_SCHEMA", "")
             if value is None:
-                self._logger.warning("SCHEMA_NAME is not set")
+                msg = "SYNAPSE_DATABASE_SCHEMA is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._schema_name = value
-        return self._schema_name
+                self._synapse_database_schema = value
+        return self._synapse_database_schema
 
-    @schema_name.setter
-    def schema_name(self, value):
-        self._schema_name = value
+    @synapse_database_schema.setter
+    def synapse_database_schema(self, value):
+        self._synapse_database_schema = value
 
     @property
-    def azure_client_id(self):
-        if self._azure_client_id == "":
-            value = os.getenv("AZURE_CLIENT_ID", "")
+    def adls_container_name(self):
+        if self._adls_container_name == "":
+            value = os.getenv("ADLS_CONTAINER_NAME", "")
             if value is None:
-                self._logger.warning("AZURE_CLIENT_ID is not set")
+                msg = "ADLS_CONTAINER_NAME is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._azure_client_id = value
-        return self._azure_client_id
+                self._adls_container_name = value
+        return self._adls_container_name
 
-    @azure_client_id.setter
-    def azure_client_id(self, value):
-        self._azure_client_id = value
+    @adls_container_name.setter
+    def adls_container_name(self, value):
+        self._adls_container_name = value
 
     @property
-    def azure_tenant_id(self):
-        if self._azure_tenant_id == "":
-            value = os.getenv("AZURE_TENANT_ID", "")
+    def purview_collection_name(self):
+        if self._purview_collection_name == "":
+            value = os.getenv("PURVIEW_COLLECTION_NAME")
             if value is None:
-                self._logger.warning("AZURE_TENANT_ID is not set")
+                msg = "PURVIEW_COLLECTION_NAME is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._azure_tenant_id = value
-        return self._azure_tenant_id
+                self._purview_collection_name = value
+        return self._purview_collection_name
 
-    @azure_tenant_id.setter
-    def azure_tenant_id(self, value):
-        self._azure_tenant_id = value
-
-    @property
-    def azure_client_secret(self):
-        if self._azure_client_secret == "":
-            value = os.getenv("AZURE_CLIENT_SECRET", "")
-            if value is None:
-                self._logger.warning("AZURE_CLIENT_SECRET is not set")
-            else:
-                self._azure_client_secret = value
-        return self._azure_client_secret
-
-    @azure_client_secret.setter
-    def azure_client_secret(self, value):
-        self._azure_client_secret = value
+    @purview_collection_name.setter
+    def purview_collection_name(self, value):
+        self._purview_collection_name = value
 
     @property
     def data_security_attribute(self):
         if self._data_security_attribute == "":
             value = os.getenv("DATA_SECURITY_ATTRIBUTE", "")
             if value is None:
-                self._logger.warning("DATA_SECURITY_ATTRIBUTE is not set")
+                msg = "DATA_SECURITY_ATTRIBUTE is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
                 self._data_security_attribute = value
         return self._data_security_attribute
@@ -262,41 +217,170 @@ class Configuration:
         self._data_security_attribute = value
 
     @property
-    def azure_keyvault_uri(self):
-        if self._azure_keyvault_uri == "":
-            value = os.getenv("KEY_VAULT_URI", "")
+    def security_managed_attribute_group(self):
+        if self._security_managed_attribute_group == "":
+            value = os.getenv("SECURITY_MANAGED_ATTRIBUTE_GROUP", "")
             if value is None:
-                self._logger.warning("KEY_VAULT_URI is not set")
+                msg = "SECURITY_MANAGED_ATTRIBUTE_GROUP is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._azure_keyvault_uri = value
-        return self._azure_keyvault_uri
+                self._security_managed_attribute_group = value
+        return self._security_managed_attribute_group
 
-    @azure_keyvault_uri.setter
-    def azure_keyvault_uri(self, value):
-        self._azure_keyvault_uri = value
+    @security_managed_attribute_group.setter
+    def security_managed_attribute_group(self, value):
+        self._security_managed_attribute_group = value
 
     @property
-    def azure_keyvault_secret(self):
-        if self._azure_keyvault_secret == "":
-            value = os.getenv("KEY_VAULT_SECRET", "")
+    def security_managed_attribute_name(self):
+        if self._security_managed_attribute_name == "":
+            value = os.getenv("SECURITY_MANAGED_ATTRIBUTE_NAME", "")
             if value is None:
-                self._logger.warning("KEY_VAULT_SECRET is not set")
+                msg = "SECURITY_MANAGED_ATTRIBUTE_NAME is not set"
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._azure_keyvault_secret = value
-        return self._azure_keyvault_secret
+                self._security_managed_attribute_name = value
+        return self._security_managed_attribute_name
 
-    @azure_keyvault_secret.setter
-    def azure_keyvault_secret(self, value):
-        self._azure_keyvault_secret = value
+    @security_managed_attribute_name.setter
+    def security_managed_attribute_name(self, value):
+        self._security_managed_attribute_name = value
+
+    @property
+    def objid_prefix(self):
+        if self._objid_prefix == "":
+            self._security_managed_attribute_name = "OBJID-"
+        return self._security_managed_attribute_name
+
+    @objid_prefix.setter
+    def objid_prefix(self, value):
+        self._objid_prefix = value
+
+    # Built from env variables
+
+    @property
+    def synapse_workspace_name(self):
+        if self._synapse_workspace_name == "":
+            if self.deployment_id == "":
+                msg = "SYNAPSE_WORSPACE_NAME requires DEPLOYMENT_ID, which is not set."
+                self._logger.error(msg)
+                raise ValueError(msg)
+            else:
+                self._synapse_workspace_name = f"syws{self.deployment_id}"
+        return self._synapse_workspace_name
+
+    @synapse_workspace_name.setter
+    def synapse_workspace_name(self, value):
+        self._synapse_workspace_name = value
+
+    @property
+    def resource_group_name(self):
+        if self._resource_group_name == "":
+            if self.deployment_id == "" or self.project == "":
+                msg = (
+                    "RESOURCE_GROUP_NAME requires DEPLOYMENT_ID and PROJECT, "
+                    "make sure both env variables are set."
+                )
+                self._logger.error(msg)
+                raise ValueError(msg)
+            else:
+                self._resource_group_name = f"{self.project}-{self.deployment_id}-rg"
+        return self._resource_group_name
+
+    @resource_group_name.setter
+    def resource_group_name(self, value):
+        self._resource_group_name = value
+
+    @property
+    def storage_account_name(self):
+        if self._storage_account_name == "":
+            if self.deployment_id == "" or self.project == "":
+                msg = (
+                    "STORAGE_ACCOUNT_NAME requires DEPLOYMENT_ID and PROJECT, "
+                    "make sure both env variables are set."
+                )
+                self._logger.error(msg)
+                raise ValueError(msg)
+            else:
+                self._storage_account_name = f"{self.project}st1{self.deployment_id}"
+        return self._storage_account_name
+
+    @storage_account_name.setter
+    def storage_account_name(self, value):
+        self._storage_account_name = value
+
+    @property
+    def purview_account_name(self):
+        if self._purview_account_name == "":
+            if self.deployment_id == "" or self.project == "":
+                msg = (
+                    "PURVIEW_ACCOUNT_NAME requires DEPLOYMENT_ID and PROJECT, "
+                    "make sure both env variables are set."
+                )
+                self._logger.error(msg)
+                raise ValueError(msg)
+            else:
+                self._purview_account_name = f"pview{self.project}{self.deployment_id}"
+        return self._purview_account_name
+
+    @purview_account_name.setter
+    def purview_account_name(self, value):
+        self._purview_account_name = value
+
+    @property
+    def keyvault_name(self):
+        if self._keyvault_name == "":
+            if self.deployment_id == "" or self.project == "":
+                msg = (
+                    "KEYVAULT_NAME requires DEPLOYMENT_ID and PROJECT, "
+                    "make sure both env variables are set."
+                )
+                self._logger.error(msg)
+                raise ValueError(msg)
+            else:
+                self._keyvault_name = f"{self.project}kv{self.deployment_id}"
+        return self._keyvault_name
+
+    @keyvault_name.setter
+    def keyvault_name(self, value):
+        self._keyvault_name = value
+
+    @property
+    def keyvault_client(self):
+        if self._keyvault_client == "":
+            if self.keyvault_name == "":
+                msg = (
+                    "KEYVAULT_CLIENT requires KEYVAULT_NAME, which is not set."
+                )
+                self._logger.error(msg)
+                raise ValueError(msg)
+            else:
+                self._keyvault_client = SecretClient(
+                    credential=DefaultAzureCredential(),
+                    vault_url=f"https://{self._keyvault_name}.vault.azure.net/",
+                )
+        return self._keyvault_client
+
+    @keyvault_client.setter
+    def keyvault_client(self, value):
+        self._keyvault_client = value
 
     @property
     def data_security_group_low(self):
         if self._data_security_group_low == "":
-            value = os.getenv("DATA_SECURITY_GROUP_LOW", "")
-            if value is None:
-                self._logger.warning("DATA_SECURITY_GROUP_LOW is not set")
+            if self.deployment_id == "" or self.project == "":
+                msg = (
+                    "DATA_SECURITY_GROUP_LOW requires DEPLOYMENT_ID and PROJECT, "
+                    "make sure both env variables are set."
+                )
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._data_security_group_low = value
+                self._data_security_group_low = (
+                    f"AADGR{self.project}{self.deployment_id}LOW"
+                )
         return self._data_security_group_low
 
     @data_security_group_low.setter
@@ -306,11 +390,17 @@ class Configuration:
     @property
     def data_security_group_medium(self):
         if self._data_security_group_medium == "":
-            value = os.getenv("DATA_SECURITY_GROUP_MEDIUM", "")
-            if value is None:
-                self._logger.warning("DATA_SECURITY_GROUP_MEDIUM is not set")
+            if self.deployment_id == "" or self.project == "":
+                msg = (
+                    "DATA_SECURITY_GROUP_MEDIUM requires DEPLOYMENT_ID and PROJECT, "
+                    "make sure both env variables are set."
+                )
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._data_security_group_medium = value
+                self._data_security_group_medium = (
+                    f"AADGR{self.project}{self.deployment_id}MED"
+                )
         return self._data_security_group_medium
 
     @data_security_group_medium.setter
@@ -320,55 +410,100 @@ class Configuration:
     @property
     def data_security_group_high(self):
         if self._data_security_group_high == "":
-            value = os.getenv("DATA_SECURITY_GROUP_HIGH", "")
-            if value is None:
-                self._logger.warning("DATA_SECURITY_GROUP_HIGH is not set")
+            if self.deployment_id == "" or self.project == "":
+                msg = (
+                    "DATA_SECURITY_GROUP_HIGH requires DEPLOYMENT_ID and PROJECT, "
+                    "make sure both env variables are set."
+                )
+                self._logger.error(msg)
+                raise ValueError(msg)
             else:
-                self._data_security_group_high = value
+                self._data_security_group_high = (
+                    f"AADGR{self.project}{self.deployment_id}HIG"
+                )
         return self._data_security_group_high
 
     @data_security_group_high.setter
     def data_security_group_high(self, value):
         self._data_security_group_high = value
 
-    @property
-    def security_group_a_oid(self):
-        if self._security_group_a_oid == "":
-            value = os.getenv("SECURITY_GROUP_A_OID", "")
-            if value is None:
-                self._logger.warning("SECURITY_GROUP_A_OID is not set")
-            else:
-                self._security_group_a_oid = value
-        return self._security_group_a_oid
-
-    @security_group_a_oid.setter
-    def security_group_a_oid(self, value):
-        self._security_group_a_oid = value
+    # From KeyVault
 
     @property
-    def security_group_b_oid(self):
-        if self._security_group_b_oid == "":
-            value = os.getenv("SECURITY_GROUP_B_OID", "")
-            if value is None:
-                self._logger.warning("SECURITY_GROUP_B_OID is not set")
-            else:
-                self._security_group_b_oid = value
-        return self._security_group_b_oid
+    def azure_client_id(self):
+        if self._azure_client_id == "":
+            self._azure_client_id = self._get_secret_from_kv(
+                var_name="AZURE_CLIENT_ID", secret_name="spAppId"
+            )
+        return self._azure_client_id.value
 
-    @security_group_b_oid.setter
-    def security_group_b_oid(self, value):
-        self._security_group_b_oid = value
+    @azure_client_id.setter
+    def azure_client_id(self, value):
+        self._azure_client_id = value
 
     @property
-    def security_group_c_oid(self):
-        if self._security_group_c_oid == "":
-            value = os.getenv("SECURITY_GROUP_C_OID", "")
-            if value is None:
-                self._logger.warning("SECURITY_GROUP_C_OID is not set")
-            else:
-                self._security_group_c_oid = value
-        return self._security_group_c_oid
+    def azure_tenant_id(self):
+        if self._azure_tenant_id == "":
+            self._azure_tenant_id = self._get_secret_from_kv(
+                var_name="AZURE_TENANT_ID", secret_name="spAppTenantId"
+            )
+        return self._azure_tenant_id.value
 
-    @security_group_c_oid.setter
-    def security_group_c_oid(self, value):
-        self._security_group_c_oid = value
+    @azure_tenant_id.setter
+    def azure_tenant_id(self, value):
+        self._azure_tenant_id = value
+
+    @property
+    def azure_client_secret(self):
+        if self._azure_client_secret == "":
+            self._azure_client_secret = self._get_secret_from_kv(
+                var_name="AZURE_CLIENT_SECRET", secret_name="spAppPass"
+            )
+        return self._azure_client_secret.value
+
+    @azure_client_secret.setter
+    def azure_client_secret(self, value):
+        self._azure_client_secret = value
+
+    @property
+    def azure_client_name(self):
+        if self._azure_client_name == "":
+            self._azure_client_name = self._get_secret_from_kv(
+                var_name="AZURE_CLIENT_NAME", secret_name="spAppName"
+            )
+        return self._azure_client_name.value
+
+    @azure_client_name.setter
+    def azure_client_name(self, value):
+        self._azure_client_name = value
+
+    @property
+    def security_file_secret(self):
+        if self._security_file_secret == "":
+            self._security_file_secret = "securityFile"
+        return self._security_file_secret
+
+    @security_file_secret.setter
+    def security_file_secret(self, value):
+        self._security_file_secret = value
+
+    def _get_secret_from_kv(self, var_name: str, secret_name: str):
+        """
+        Utility method to get secrets from KeyVault and handle exceptions.
+        """
+        if self.keyvault_client == "":
+            msg = f"{var_name} requires KEYVAULT_NAME, which is not set."
+            self._logger.error(msg)
+            raise ValueError(msg)
+        else:
+            try:
+                return self.keyvault_client.get_secret(secret_name)
+            except (
+                ResourceNotFoundError,
+                HttpResponseError,
+                ServiceRequestError,
+            ) as ex:
+                self._logger.error(
+                    f"Unable to retrieve secret {secret_name} from key vault. {ex}"
+                )
+                return None

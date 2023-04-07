@@ -22,9 +22,6 @@ class StorageHelper:
         """
         self._logger = logging.getLogger(__name__)
 
-        if not account_name:
-            raise ValueError("account_name must not be empty")
-
         credential = DefaultAzureCredential()
         self._client = BlobServiceClient(
             f"https://{account_name}.blob.core.windows.net", credential
