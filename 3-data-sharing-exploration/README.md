@@ -96,6 +96,8 @@ basically deploys all necessary infra structure and data that will be used by
 the other modules. This module could be replaced by the Data marketplace
 functionality when the sample becomes available.
 
+Deployment detailed instructions can be found [here](#running-the-deployment).
+
 ## Data Transfer
 
 The present sample, uploads two versions of the "adventureworkslt" database in
@@ -127,6 +129,8 @@ Analytics for:
     mapped to security logins and db users in Synapse so that the access is
     aligned accordingly. The 3 Security groups are created at the time of the
     deployment and they are used by default on the Security basic module.
+
+Initial Setup detailed instructions can be found [here](#running-the-initial-setup).
  
 ## Data Ingestion
 
@@ -149,12 +153,14 @@ The metadata files used for the sample can be found in this repo:
 - [adventure_works_1.0.0.json](sample_data/_meta/adventure_works_1.0.0.json)
 - [adventure_works_2.0.0.json](sample_data/_meta/adventure_works_2.0.0.json)
 
+Data Ingestion detailed instructions can be found [here](#running-data-ingest).
 ## Data Catalog
 
 This module is responsible for interacting with Purview to catalog the newly
 created assets in Synapse and enrich the entries using information supplied in
 the metadata.
 
+Data Catalog detailed instructions can be found [here](#running-data-catalog).
 ## Data Security 
 
 The Data Security module is responsible for applying data security in Azure Data
@@ -168,7 +174,7 @@ types of data security supported by the module:
 
 - **Data Security Basic**, based on fixed security groups in Azure Active
   Directory. (AD).
-- **Data Security Advance**, based on a configuration file from KeyVault.
+- **Data Security Advanced**, based on a configuration file from KeyVault.
 
 ### Data Security Basic
 
@@ -177,6 +183,8 @@ gathered form the metadata file and applied in Purview by the Data Catalog
 module. Depending on the value of that attribute (either at table or column
 level), the AAD Groups created at deployment time should have visibility on the
 data.
+
+Data Security Basic detailed instructions can be found [here](#basic).
 
 ### Data Security Advanced
 
@@ -187,6 +195,8 @@ automatically generated at deployment time and stored in KeyVault, and it
 defines a simple 1 to 1 mapping between 'Sensitivity' attribute and AAD Groups.
 However, the file can and should be updated by the customer with his own AAD
 Groups and Rules, which will be used to apply security.
+
+Data Security Advanced detailed instructions can be found [here](#advanced).
 
 ## Running the Sample end-to-end
 ### Pre-requirements without using Dev Containers
