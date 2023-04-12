@@ -230,22 +230,26 @@ class DataSecuritySynapse:
             )
             if isinstance(assigned_security_group_value, dict):
                 for value in assigned_security_group_value:
+                    securtiy_group = assigned_security_group_value[value]
+                    if securtiy_group != "Not Assigned":
+                        sqlGrantStatement = (
+                            f"GRANT SELECT ON {schema}.{assigned_security_group}({value}) TO "
+                            f"{securtiy_group}"
+                        )
+                        self._sql_helper.execute_sql(sql=sqlGrantStatement)
+            else:
+                securtiy_group = assigned_security_groups[assigned_security_group]
+                if securtiy_group != "Not Assigned":
                     sqlGrantStatement = (
-                        f"GRANT SELECT ON {schema}.{assigned_security_group}({value}) TO "
-                        f"{assigned_security_group_value[value]}"
+                        f"GRANT SELECT ON {schema}.{assigned_security_group} TO "
+                        f"{securtiy_group}"
                     )
                     self._sql_helper.execute_sql(sql=sqlGrantStatement)
-            else:
-                sqlGrantStatement = (
-                    f"GRANT SELECT ON {schema}.{assigned_security_group} TO "
-                    f"{assigned_security_groups[assigned_security_group]}"
-                )
-                self._sql_helper.execute_sql(sql=sqlGrantStatement)
         return None
 
     def _cleanup_database_users(self, security_file: DataSecurityFile = None):
 
-        '''
+        """
         Drops and recreates all db useres associated to AD Security Groups
 
         Parameters
@@ -253,7 +257,7 @@ class DataSecuritySynapse:
         security_file: DataSecurityFile = None
             If None, then the basic security is applied and the 3 Security Groups
             are gathered from config.
-        '''
+        """
         users = [
             self._configuration.data_security_group_low,
             self._configuration.data_security_group_medium,
