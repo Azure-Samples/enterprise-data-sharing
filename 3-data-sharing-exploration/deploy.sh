@@ -1,6 +1,6 @@
 #!/bin/bash
 
-chmod +x "./scripts/deploy_infrastructure.sh"
+sudo chmod +x "./scripts/deploy_infrastructure.sh"
 
 . ./scripts/verify_prerequisites.sh
 
