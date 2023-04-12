@@ -237,18 +237,18 @@ the previous pre-requisites:
 In order to open the project in a container follow the following steps:
 
 - Open Visual Studio Code and clone the repository.
-- Use the .env.template file located in \enterprise-data-sharing\src to create a
+- Use the .env.template file located in \enterprise-data-sharing\3-data-sharing-exploration\src to create a
  file named `.env` with the selected values for the current deployment. Some
  variables are pre-populated with default values.
 - Hit Control-Shift-P to open the command palette and type Dev Containers: Open
   Folder in Container ...
-- When prompted, select the directory \enterprise-data-sharing
+- When prompted, select the directory \enterprise-data-sharing\3-data-sharing-exploration
 - Wait for the container to build, check the logs for more information.
 
 ### Running the deployment
 
 After all the pre-requisites are implemented, the deployment can be triggered.
-Navigate to the directory /enterprise-data-sharing/ and run the following
+Navigate to the directory /enterprise-data-sharing/3-data-sharing-exploration and run the following
 command:
 
 ```bash
@@ -435,7 +435,8 @@ content looks as follow and is stored in Key Vault under "securityFile" name.
 }
  ```
 
-To run the Data Catalog module confirm that:
+To run the Data Security module confirm that:
+
 - The data security file must be updated by the user (we need at least 2
   versions of the secret in KeyVault). That means the user can extend or change
   the current security groups to their own use case.
@@ -529,3 +530,4 @@ and remove the AAD groups deployed:
 - AADGR<PROJECT_NAME><DEPLOYMENT_ID>_LOW
 - AADGR<PROJECT_NAME><DEPLOYMENT_ID>_MEDIUM
 - AADGR<PROJECT_NAME><DEPLOYMENT_ID>_HIGH
+and the Service Principle created with name in format <PROJECT_NAME>-<DEPLOYMENT_ID>-sp
