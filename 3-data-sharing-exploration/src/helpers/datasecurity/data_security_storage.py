@@ -233,6 +233,7 @@ class DataSecurityStorage:
                 unique_security_groups_in_view = list(
                     dict.fromkeys(assigned_security_groups.get(item).values())
                 )
+                unique_security_groups_in_view.remove("Not Assigned")
                 assigned_security_groups[item] = unique_security_groups_in_view
         self.logger.info(
             "Removed unnecessary column information. Assigned security groups: "
