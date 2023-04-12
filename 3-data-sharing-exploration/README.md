@@ -507,6 +507,9 @@ The main code for security advanced includes the following operations:
 - Apply access control lists (ACL) to all folders and files.
 - Apply ACL to the root directory so that all groups have access at the root
   level.
+
+*Note* : If one wants to apply security based on added contraints then those constraints should be present as a managed attributes should be applied in purview.
+
 ## Issues and Workarounds
 
 ### Please register/re-register subscription xxxx with Microsoft.Purview resource provider.
