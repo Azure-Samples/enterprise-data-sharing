@@ -257,6 +257,21 @@ az account set -s <SUBSCRIPTION_ID>
 chmod +x ./deploy.sh # NOTE: you might need to use sudo if you don't have enough permissions
 set -a && source ./src/.env && bash ./deploy.sh 
 ```
+
+NOTE:
+When running in MacOS M1, if you run into the following warning/error,
+
+```bash
+WARNING: The configuration value of bicep.use_binary_from_path has been set to 'false'.
+ERROR: qemu-x86_64: Could not open '/lib64/ld-linux-x86-64.so.2': No such file or directory
+```
+
+run the following command to fix the error:
+
+```bash
+az config set bicep.use_binary_from_path=True
+```
+
 ### Deployment considerations
 
 The script firstly deploys the infrastructure that is required to demonstrate
