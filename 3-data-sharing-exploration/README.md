@@ -536,6 +536,15 @@ The used subscription must have the Microsoft.Purview provider registered.
 The used subscription must have the Microsoft.EventHub and Microsoft.Storage
 registered.
 
+### Missing ODBC Driver for SQL Server
+
+If you run into the following issue:
+
+![odbc-error](./images/eds-repo-odbc-driver-error.png)
+
+you need to Install the ODBC Driver in your machine.
+Follow instructions here: <https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15&tabs=debian18-install%2Calpine17-install%2Cdebian8-install%2Credhat7-13-install%2Crhel7-offline>
+
 ## Removing the sample assets
 
 You can clean up all the assets and avoid additional costs by deleting the main
