@@ -226,6 +226,9 @@ Clone the repository and follow this prerequisites in order to run the sample:
   - DATA_SECURITY_ATTRIBUTE=Sensitivity
   - SECURITY_MANAGED_ATTRIBUTE_GROUP=Metadata
   - SECURITY_MANAGED_ATTRIBUTE_NAME=SecurityGroup
+- Install the ODBC Driver in your machine.
+  Follow instructions here: <https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15&tabs=debian18-install%2Calpine17-install%2Cdebian8-install%2Credhat7-13-install%2Crhel7-offline>
+
 ### Pre-requirements using Dev Containers
 
 To use a Dev Container, you need to have the following software in addition to
@@ -258,19 +261,7 @@ chmod +x ./deploy.sh # NOTE: you might need to use sudo if you don't have enough
 set -a && source ./src/.env && bash ./deploy.sh 
 ```
 
-NOTE:
-When running in MacOS M1, if you run into the following warning/error,
-
-```bash
-WARNING: The configuration value of bicep.use_binary_from_path has been set to 'false'.
-ERROR: qemu-x86_64: Could not open '/lib64/ld-linux-x86-64.so.2': No such file or directory
-```
-
-run the following command to fix the error:
-
-```bash
-az config set bicep.use_binary_from_path=True
-```
+NOTE: If you run into an error while on MacOS M1, please check the Issues and Workarounds section.
 
 ### Deployment considerations
 
@@ -536,6 +527,21 @@ The used subscription must have the Microsoft.Purview provider registered.
 The used subscription must have the Microsoft.EventHub and Microsoft.Storage
 registered.
 
+### Library error when running in MacOS M1
+
+When running in MacOS M1, if you run into the following warning/error,
+
+```bash
+WARNING: The configuration value of bicep.use_binary_from_path has been set to 'false'.
+ERROR: qemu-x86_64: Could not open '/lib64/ld-linux-x86-64.so.2': No such file or directory
+```
+
+run the following command to fix the error:
+
+```bash
+az config set bicep.use_binary_from_path=True
+```
+ 
 ### Missing ODBC Driver for SQL Server
 
 If you run into the following issue:
