@@ -37,7 +37,7 @@ resource vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     enabledForDiskEncryption: true
     enableSoftDelete: true
     enablePurgeProtection: true
-    softDeleteRetentionInDays: 90
+    softDeleteRetentionInDays: 7
     tenantId: customerTenantId
   }
 }
@@ -86,7 +86,7 @@ resource customerTenantIdKvSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01'
   }
 }
 
-resource analyticsSPClientSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = if (analytics.withAnalytics) {
+resource analyticsSPClientSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: vault
   name: 'analytics-sp-client-secret'
   properties: {
@@ -97,7 +97,7 @@ resource analyticsSPClientSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' 
   }
 }
 
-resource analyticsClientIdKvSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = if (analytics.withAnalytics) {
+resource analyticsClientIdKvSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: vault
   name: 'analytics-sp-client-id'
   properties: {
@@ -108,7 +108,7 @@ resource analyticsClientIdKvSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01
   }
 }
 
-resource analyticsObjectIdKvSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = if (analytics.withAnalytics) {
+resource analyticsObjectIdKvSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: vault
   name: 'analytics-sp-object-id'
   properties: {
@@ -133,6 +133,7 @@ resource spIdentityIsOwnerOfManagedRg 'Microsoft.Authorization/roleAssignments@2
     principalId: serviceProviderIdentity.properties.principalId
     roleDefinitionId: tenantResourceId('Microsoft.Authorization/roleDefinitions', ownerRoleId)
     delegatedManagedIdentityResourceId: crossTenant ? serviceProviderIdentity.id : null
+    principalType: 'ServicePrincipal'
   }
 }
 
@@ -145,6 +146,7 @@ resource spIdentityIsKvAdministrator 'Microsoft.Authorization/roleAssignments@20
     principalId: serviceProviderIdentity.properties.principalId
     roleDefinitionId: tenantResourceId('Microsoft.Authorization/roleDefinitions', kvAdministratorRoleId)
     delegatedManagedIdentityResourceId: crossTenant ? serviceProviderIdentity.id : null
+    principalType: 'ServicePrincipal'
   }
 }
 

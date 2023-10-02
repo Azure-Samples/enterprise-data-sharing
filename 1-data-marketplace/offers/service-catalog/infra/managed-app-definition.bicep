@@ -16,16 +16,6 @@ param environmentCode string
 var ownerRoleId = '8e3af657-a8ff-443c-a75c-2fe8c4bcb635'
 var keyVaultSecretUsersRoleId = '4633458b-17de-408a-b874-0445c86b69e6'
 
-var baseCreateUiDefinition = loadJsonContent('createUiDefinition.json')
-var uiDefinitionPatch = {
-  parameters: {
-    outputs: {
-      definitionEnvironmentCode: environmentCode
-    }
-  }
-}
-var customizedUiDefinition = union(baseCreateUiDefinition, uiDefinitionPatch)
-
 resource managedApplicationDefinition 'Microsoft.Solutions/applicationDefinitions@2021-07-01' = {
   name: name
   location: location
@@ -34,7 +24,7 @@ resource managedApplicationDefinition 'Microsoft.Solutions/applicationDefinition
     lockLevel: 'ReadOnly'
     description: 'This is the Enterprise Data Sharing offer for single tenant usage (${environmentCode})'
     displayName: 'Enterprise Data Sharing single tenant offer (${environmentCode})'
-    createUiDefinition: customizedUiDefinition
+    createUiDefinition: loadJsonContent('createUiDefinition.json')
     mainTemplate: loadJsonContent('mainTemplate.json') // NOTE: generated at build time
     authorizations: [
       {
