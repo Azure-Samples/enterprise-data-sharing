@@ -16,6 +16,7 @@ param skuName string
 param skuTier string
 param kubeletIdentityName string
 param aksIdentityName string
+param crossTenant bool
 
 resource kubeletidentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: kubeletIdentityName
@@ -36,7 +37,7 @@ resource aksManagedIdentityOperatorRole 'Microsoft.Authorization/roleAssignments
   properties: {
     principalId: aksIdentity.properties.principalId
     roleDefinitionId: tenantResourceId('Microsoft.Authorization/roleDefinitions', aksOperatorRole)
-    delegatedManagedIdentityResourceId: aksIdentity.id
+    delegatedManagedIdentityResourceId: crossTenant ? aksIdentity.id : null
     principalType: 'ServicePrincipal'
   }
 }

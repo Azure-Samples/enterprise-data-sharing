@@ -1,15 +1,11 @@
-@description('The kit identifier to append to the resources names')
-param kitIdentifier string
-@description('The suffix to append to the resources names')
-param resourceSuffix string
 @description('The location of the resources deployed. Default to same as resource group')
 param location string = resourceGroup().location
-@description('The suffix to append to the resources names. Composed of the short location and the environment')
-param resourceInfix string
+param identityName string
 @description('Name of the keyvault')
 param vaultName string
 param spIdentityResourceId string
 param commonResourceTags object
+param crossTenant bool
 
 var storageEncryptionKeyName = 'storageEncryption'
 var vmEncryptionKeyName = 'vmEncryption'
@@ -99,7 +95,7 @@ resource keyScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
 }
 
 resource uami 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: 'id-${resourceInfix}-${kitIdentifier}-kv-${resourceSuffix}'
+  name: identityName
   location: location
   tags: commonResourceTags
 }
@@ -111,7 +107,7 @@ resource uamiIsEncryptionUserOnKeyVault 'Microsoft.Authorization/roleAssignments
   properties: {
     principalId: uami.properties.principalId
     roleDefinitionId: tenantResourceId('Microsoft.Authorization/roleDefinitions', kvEncryptionUserRole)
-    delegatedManagedIdentityResourceId: uami.id
+    delegatedManagedIdentityResourceId: crossTenant ? uami.id : null
     principalType: 'ServicePrincipal'
   }
 }

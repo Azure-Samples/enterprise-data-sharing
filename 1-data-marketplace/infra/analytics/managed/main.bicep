@@ -15,6 +15,7 @@ param keyVaultUri string
 param encryptionKeyName string
 @description('The offer tier configuration for the kit')
 param offerTier string
+param crossTenant bool
 
 var abbreviations = loadJsonContent('../../../abbreviations.json')
 
@@ -54,6 +55,7 @@ module func 'func.bicep' = {
     skuKind: offerTierConfiguration[offerTier].funcSkuKind
     skuName: offerTierConfiguration[offerTier].funcSkuName
     skuTier: offerTierConfiguration[offerTier].funcSkuTier
+    crossTenant: crossTenant
   }
 }
 

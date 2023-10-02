@@ -14,6 +14,8 @@ param analyticsPrincipalSecret string = ''
 param customerTenantId string
 param analytics object
 param baseTime string = utcNow('u')
+param crossTenant bool
+
 var secretExpiration = dateTimeToEpoch(dateTimeAdd(baseTime, 'P1Y'))
 
 var resourceSuffix = take(uniqueString(resourceGroup().name), 6)
@@ -130,7 +132,7 @@ resource spIdentityIsOwnerOfManagedRg 'Microsoft.Authorization/roleAssignments@2
   properties: {
     principalId: serviceProviderIdentity.properties.principalId
     roleDefinitionId: tenantResourceId('Microsoft.Authorization/roleDefinitions', ownerRoleId)
-    delegatedManagedIdentityResourceId: serviceProviderIdentity.id
+    delegatedManagedIdentityResourceId: crossTenant ? serviceProviderIdentity.id : null
   }
 }
 
@@ -142,7 +144,7 @@ resource spIdentityIsKvAdministrator 'Microsoft.Authorization/roleAssignments@20
   properties: {
     principalId: serviceProviderIdentity.properties.principalId
     roleDefinitionId: tenantResourceId('Microsoft.Authorization/roleDefinitions', kvAdministratorRoleId)
-    delegatedManagedIdentityResourceId: serviceProviderIdentity.id
+    delegatedManagedIdentityResourceId: crossTenant ? serviceProviderIdentity.id : null
   }
 }
 

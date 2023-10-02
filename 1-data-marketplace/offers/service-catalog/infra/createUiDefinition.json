@@ -418,6 +418,7 @@
       "analyticsPrincipalSecret": "[steps('Analytics').DataIntegrationServicePrincipal.ServicePrincipal.password]",
       "analyticsPrincipalObjectId": "[first(steps('Analytics').DataIntegrationServicePrincipal.ServicePrincipal.objectId)]",
       "customerTenantId": "[subscription().tenantId]",
+      "crossTenant": false,
       "analytics": {
         "useExistingCoManagedResourceGroup": "[equals(steps('Analytics').analyticsResourceGroupSection.analyticsResourceGroupType,'existing')]",
         "coManagedResourceGroupName": "[coalesce(steps('Analytics').analyticsResourceGroupSection.analyticsResourceGroupSelector, '')]",

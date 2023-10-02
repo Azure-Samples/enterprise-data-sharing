@@ -1,6 +1,4 @@
 param location string
-param resourceSuffix string
-param resourceInfix string
 param commonResourceTags object
 param coManagedServiceProviderDatalakeResourceId string
 param customerClientId string
@@ -8,12 +6,16 @@ param customerClientId string
 param customerClientSecret string
 param analyticsCoManagedResourceGroupName string
 param customerTenantId string
+param vnetName string
+param privateEndpointsNamePrefix string
+param privateLinkServicesNamePrefix string
+param networkInterfacesNamePrefix string
 
 var coManagedServiceProviderDatalakeName = last(split(coManagedServiceProviderDatalakeResourceId, '/'))
 var requestMessageApproval = 'Please Approve the connection for the Enterprise Data Sharing Platform'
 
 resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' existing = {
-  name: 'vnet-${resourceInfix}-fdm-${resourceSuffix}'
+  name: vnetName
 }
 
 resource endpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-05-01' existing = {
@@ -30,18 +32,18 @@ resource storageDfsPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01'
 }
 
 resource coManagedServiceProviderDatalakeBlobPE 'Microsoft.Network/privateEndpoints@2022-07-01' = {
-  name: 'pe-blob-${coManagedServiceProviderDatalakeName}'
+  name: '${privateEndpointsNamePrefix}blob-${coManagedServiceProviderDatalakeName}'
   location: location
   tags: commonResourceTags
 
   properties: {
-    customNetworkInterfaceName: 'nic-pe-blob-${coManagedServiceProviderDatalakeName}'
+    customNetworkInterfaceName: '${networkInterfacesNamePrefix}pe-blob-${coManagedServiceProviderDatalakeName}'
     subnet: {
       id: endpointsSubnet.id
     }
     manualPrivateLinkServiceConnections: [
       {
-        name: 'link-pe-blob-${coManagedServiceProviderDatalakeName}'
+        name: '${privateLinkServicesNamePrefix}blob-${coManagedServiceProviderDatalakeName}'
         properties: {
           privateLinkServiceId: coManagedServiceProviderDatalakeResourceId
           requestMessage: requestMessageApproval
@@ -69,18 +71,18 @@ resource coManagedServiceProviderDatalakeBlobPE 'Microsoft.Network/privateEndpoi
 }
 
 resource customerDatalakeDfsPE 'Microsoft.Network/privateEndpoints@2022-07-01' = {
-  name: 'pe-dfs-${coManagedServiceProviderDatalakeName}'
+  name: '${privateEndpointsNamePrefix}dfs-${coManagedServiceProviderDatalakeName}'
   location: location
   tags: commonResourceTags
 
   properties: {
-    customNetworkInterfaceName: 'nic-pe-dfs-${coManagedServiceProviderDatalakeName}'
+    customNetworkInterfaceName: '${networkInterfacesNamePrefix}pe-dfs-${coManagedServiceProviderDatalakeName}'
     subnet: {
       id: endpointsSubnet.id
     }
     manualPrivateLinkServiceConnections: [
       {
-        name: 'link-pe-dfs-${coManagedServiceProviderDatalakeName}'
+        name: '${privateLinkServicesNamePrefix}dfs-${coManagedServiceProviderDatalakeName}'
         properties: {
           privateLinkServiceId: coManagedServiceProviderDatalakeResourceId
           requestMessage: requestMessageApproval
@@ -97,7 +99,7 @@ resource customerDatalakeDfsPE 'Microsoft.Network/privateEndpoints@2022-07-01' =
     properties: {
       privateDnsZoneConfigs: [
         {
-          name: 'privatelink-pe-dfs-${coManagedServiceProviderDatalakeName}'
+          name: 'link-pe-dfs-${coManagedServiceProviderDatalakeName}'
           properties: {
             privateDnsZoneId: storageDfsPrivateDnsZone.id
           }

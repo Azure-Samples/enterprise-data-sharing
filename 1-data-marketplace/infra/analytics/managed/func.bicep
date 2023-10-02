@@ -15,6 +15,7 @@ param storageName string
 param hostingPlanName string
 param privateEndpointPrefix string
 param privateLinkServicePrefix string
+param crossTenant bool
 
 var storageUrl = environment().suffixes.storage
 var privateDnsZoneBlobName = 'privatelink.blob.${storageUrl}'
@@ -375,7 +376,7 @@ resource functionIsSecretUserOnKeyVault 'Microsoft.Authorization/roleAssignments
   properties: {
     principalId: functionApp.identity.principalId
     roleDefinitionId: tenantResourceId('Microsoft.Authorization/roleDefinitions', kvSecretsUserRole)
-    delegatedManagedIdentityResourceId: functionApp.id
+    delegatedManagedIdentityResourceId: crossTenant ? functionApp.id : null
     principalType: 'ServicePrincipal'
     description: 'Allows the function app to read secrets from the key vault'
   }
@@ -389,7 +390,7 @@ resource functionIsContributorOnDatashare 'Microsoft.Authorization/roleAssignmen
   properties: {
     principalId: functionApp.identity.principalId
     roleDefinitionId: tenantResourceId('Microsoft.Authorization/roleDefinitions', contributorRoleId)
-    delegatedManagedIdentityResourceId: functionApp.id
+    delegatedManagedIdentityResourceId: crossTenant ? functionApp.id : null
     principalType: 'ServicePrincipal'
     description: 'Allows the function app to manage the datashare'
   }

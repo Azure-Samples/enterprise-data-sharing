@@ -9,6 +9,7 @@ param jumpServerAdminPassword string
 ])
 param environment string
 param offerTier string
+param crossTenant bool
 
 var abbreviations = loadJsonContent('../abbreviations.json')
 var resourceInfix = '${shortLocation}-${environment}'
@@ -27,6 +28,7 @@ module foundation 'foundation/main.bicep' = {
     resourceSuffix: resourceSuffix
     commonResourceTags: { eds_area: 'foundation' }
     offerTier: offerTier
+    crossTenant: crossTenant
   }
 }
 
@@ -48,6 +50,7 @@ module analyticsManaged 'analytics/managed/main.bicep' = {
     encryptionKeyName: foundation.outputs.encryptionKeyName
     uamiEncryptionResourceId: foundation.outputs.uamiEncryptionResourceId
     offerTier: offerTier
+    crossTenant: crossTenant
   }
 }
 

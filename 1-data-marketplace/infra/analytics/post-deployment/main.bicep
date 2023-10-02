@@ -14,11 +14,12 @@ param customerTenantId string
 
 var abbreviations = loadJsonContent('../../../abbreviations.json')
 
+var vnetName = '${abbreviations.networkVirtualNetworks}${resourceInfix}-fnd-${resourceSuffix}'
 module synapsePrivateEndpoint 'synapse-network.bicep' = {
   name: 'analytics-post-deployment-synapse-network'
 
   params: {
-    vnetName: '${abbreviations.networkVirtualNetworks}${resourceInfix}-fnd-${resourceSuffix}'
+    vnetName: vnetName
     privateEndpointsNamePrefix: abbreviations.networkPrivateEndpoints
     privateLinkServiceNamePrefix: abbreviations.networkPrivateLinkServices
     location: location
@@ -38,8 +39,10 @@ module serviceProviderCoManagedDatalakeNetwork 'co-managed-service-provider-data
     coManagedServiceProviderDatalakeResourceId: coManagedServiceProviderDatalakeResourceId
     commonResourceTags: commonResourceTags
     location: location
-    resourceInfix: resourceInfix
-    resourceSuffix: resourceSuffix
+    networkInterfacesNamePrefix: abbreviations.networkNetworkInterfaces
+    privateEndpointsNamePrefix: abbreviations.networkPrivateEndpoints
+    privateLinkServicesNamePrefix: abbreviations.networkPrivateLinkServices
+    vnetName: vnetName
     customerClientId: customerClientId
     customerClientSecret: customerClientSecret
     analyticsCoManagedResourceGroupName: analyticsCoManagedResourceGroupName

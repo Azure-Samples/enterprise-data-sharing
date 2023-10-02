@@ -13,6 +13,7 @@ param vaultName string
 param commonResourceTags object
 @description('The offer tier')
 param offerTier string
+param crossTenant bool
 
 var abbreviations = loadJsonContent('../../abbreviations.json')
 
@@ -125,6 +126,7 @@ module cluster 'aks.bicep' = {
     logAnalyticsWorkspaceId: monitoring.outputs.logAnalyticsWorkspaceId
     skuName: offerTierConfiguration[offerTier].aksSkuName
     skuTier: offerTierConfiguration[offerTier].aksSkuTier
+    crossTenant: crossTenant
   }
 }
 
@@ -138,13 +140,12 @@ module serviceProviderIdentity 'identity.bicep' = {
 module encryption 'encryption.bicep' = {
   name: 'foundation-encryption'
   params: {
-    kitIdentifier: kitIdentifier
+    identityName: '${abbreviations.managedIdentityUserAssignedIdentities}${resourceInfix}-${kitIdentifier}-kv-${resourceSuffix}'
     commonResourceTags: commonResourceTags
     vaultName: vaultName
     location: location
-    resourceInfix: resourceInfix
-    resourceSuffix: resourceSuffix
     spIdentityResourceId: serviceProviderIdentity.outputs.resourceId
+    crossTenant: crossTenant
   }
 }
 
