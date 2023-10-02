@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: Enterprise Data Sharing - Service Catalog Offer
+hooks:
+  preprovision:
+    shell: sh
+    continueOnError: false
+    interactive: false
+    run: |
+      echo 'Building infra/mainTemplate.bicep ...'
+      az bicep build --file infra/mainTemplate.bicep

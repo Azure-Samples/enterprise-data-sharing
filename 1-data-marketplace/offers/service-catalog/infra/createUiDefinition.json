@@ -1,0 +1,433 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Azure.CreateUIDef",
+  "version": "0.1.2-preview",
+  "parameters": {
+    "config": {
+      "isWizard": true,
+      "basics": {
+        "description": "**This wizard will bootstrap the installation of the Enterprise Data Sharing Platform with a minimal set of resources.</br> The full set of resources will be deployed after this bootstrap process is completed.**",
+        "subscription": {
+          "resourceProviders": [
+            "Microsoft.ApiManagement",
+            "Microsoft.Authorization",
+            "Microsoft.Compute",
+            "Microsoft.ContainerInstance",
+            "Microsoft.ContainerRegistry ",
+            "Microsoft.ContainerService",
+            "Microsoft.DataLakeStore",
+            "Microsoft.DataShare",
+            "Microsoft.Dashboard ",
+            "Microsoft.insights",
+            "Microsoft.KeyVault",
+            "Microsoft.ManagedIdentity",
+            "Microsoft.Network",
+            "Microsoft.OperationalInsights",
+            "Microsoft.OperationsManagement",
+            "Microsoft.Purview",
+            "Microsoft.Resources",
+            "Microsoft.SecurityInsights",
+            "Microsoft.Storage",
+            "Microsoft.Sql",
+            "Microsoft.SqlVirtualMachine",
+            "Microsoft.Synapse",
+            "Microsoft.Web"
+          ]
+        },
+        "resourceGroup": {
+          "allowExisting": true
+        },
+        "location": {
+          "label": "Deployment location",
+          "toolTip": "Installation location is limited to these regions.",
+          "allowedValues": [
+            "australiaeast",
+            "australiasoutheast",
+            "brazilsouth",
+            "canadacentral",
+            "canadaeast",
+            "centralindia",
+            "centralus",
+            "eastasia",
+            "eastus",
+            "eastus2",
+            "francecentral",
+            "germanywestcentral",
+            "japaneast",
+            "japanwest",
+            "jioindiawest",
+            "koreacentral",
+            "northcentralus",
+            "northeurope",
+            "norwayeast",
+            "norwaywest",
+            "southafricanorth",
+            "southcentralus",
+            "southindia",
+            "southeastasia",
+            "swedencentral",
+            "swedensouth",
+            "switzerlandnorth",
+            "switzerlandwest",
+            "uaenorth",
+            "uksouth",
+            "ukwest",
+            "westcentral",
+            "westeurope",
+            "westindia",
+            "westus",
+            "westus2",
+            "westus3"
+          ],
+          "visible": true
+        }
+      }
+    },
+    "basics": [
+      {
+        "name": "environment",
+        "type": "Microsoft.Common.OptionsGroup",
+        "label": "Select platform environment type",
+        "defaultValue": "null",
+        "toolTip": "Your selection will impact the naming convention of the deployed resources and the resource tags",
+        "constraints": {
+          "allowedValues": [
+            {
+              "label": "Production",
+              "value": "prd"
+            },
+            {
+              "label": "Testing",
+              "value": "tst"
+            }
+          ],
+          "required": true
+        },
+        "visible": true
+      },
+      {
+        "name": "tier",
+        "type": "Microsoft.Common.OptionsGroup",
+        "label": "Select platform tier",
+        "defaultValue": "null",
+        "toolTip": "Select platform tier",
+        "constraints": {
+          "allowedValues": [
+            {
+              "label": "Standard",
+              "value": "standard"
+            },
+            {
+              "label": "Basic",
+              "value": "basic"
+            }
+          ],
+          "required": true
+        },
+        "visible": "[contains(subscription().tenantId, 'd3bc2180-cb1e-40f7-b59a-154105743342')]"
+      }
+    ],
+    "steps": [
+      {
+        "name": "Analytics",
+        "label": "Analytics",
+        "elements": [
+          {
+            "name": "analyticsResourceGroupSection",
+            "type": "Microsoft.Common.Section",
+            "label": "Analytics Resource Group",
+            "elements": [
+              {
+                "name": "analyticsSourceInfo",
+                "type": "Microsoft.Common.InfoBox",
+                "options": {
+                  "icon": "Info",
+                  "text": "Enterprise Data Sharing Platform requires a dedicated resource group for Analytics package installation.<br/>Please select whether you want to use an existing resource group or create a new one.<br/>If you select create new, the installation wizard will generate the resource group name for you."
+                }
+              },
+              {
+                "name": "analyticsResourceGroupType",
+                "type": "Microsoft.Common.OptionsGroup",
+                "label": "Select Analytics resource group type",
+                "toolTip": "Select Analytics resource group type for the Enterprise Data Sharing Platform.",
+                "constraints": {
+                  "allowedValues": [
+                    {
+                      "label": "Create new",
+                      "value": "new"
+                    },
+                    {
+                      "label": "Select existing",
+                      "value": "existing"
+                    }
+                  ],
+                  "required": true
+                },
+                "visible": true
+              },
+              {
+                "name": "getAnalyticsResourceGroups",
+                "type": "Microsoft.Solutions.ArmApiControl",
+                "request": {
+                  "method": "GET",
+                  "path": "[concat(subscription().id, '/resourceGroups?api-version=2021-04-01')]"
+                }
+              },
+              {
+                "name": "analyticsResourceGroupSelector",
+                "type": "Microsoft.Common.DropDown",
+                "label": "Select Analytics resource group",
+                "filter": true,
+                "filterPlaceholder": "Filter items ...",
+                "toolTip": "Select an existing resource group dedicated to Analytics package for the Enterprise Data Sharing Platform.",
+                "constraints": {
+                  "allowedValues": "[filter(map(steps('Analytics').analyticsResourceGroupSection.getAnalyticsResourceGroups.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\", \"location\":\"', item.location, '\"}'))), (item) => and(contains(item.location, location()), not(contains(item.label, steps('Agility').agilityResourceGroupSection.agilityResourceGroupSelector))))]",
+                  "required": true
+                },
+                "visible": "[equals(steps('Analytics').analyticsResourceGroupSection.analyticsResourceGroupType,'existing')]"
+              }
+            ]
+          },
+          {
+            "name": "synapseSection",
+            "type": "Microsoft.Common.Section",
+            "label": "Azure Synapse",
+            "elements": [
+              {
+                "name": "synapseSourceInfo",
+                "type": "Microsoft.Common.InfoBox",
+                "options": {
+                  "icon": "Info",
+                  "text": "Enterprise Data Sharing Platform requires a Synapse workspace.<br/>Please select whether you want to use an existing Synapse workspace or install a new one."
+                }
+              },
+              {
+                "name": "synapseSource",
+                "type": "Microsoft.Common.OptionsGroup",
+                "label": "Select Synapse workspace source",
+                "toolTip": "If you have an existing Synapse workspace, you still can install a new one dedicated for the Enterprise Data Sharing Platform.",
+                "constraints": {
+                  "allowedValues": [
+                    {
+                      "label": "Install a new Synapse workspace",
+                      "value": "new"
+                    },
+                    {
+                      "label": "Use an existing Synapse workspace",
+                      "value": "existing"
+                    }
+                  ],
+                  "required": true
+                },
+                "visible": true
+              },
+              {
+                "name": "synapseSelector",
+                "type": "Microsoft.Solutions.ResourceSelector",
+                "label": "Select Synapse",
+                "toolTip": "Select the Azure Synapse instance that will receive configuration and data from the Creation Platform",
+                "resourceType": "Microsoft.Synapse/workspaces",
+                "visible": "[equals(steps('Analytics').synapseSection.synapseSource,'existing')]",
+                "options": {
+                  "filter": {
+                    "subscription": "all",
+                    "location": "all"
+                  }
+                },
+                "constraints": {
+                  "required": true
+                }
+              },
+              {
+                "name": "synapseSqlAdminGroupObjectId",
+                "type": "Microsoft.Common.TextBox",
+                "label": "Synapse Administrator Azure AD group",
+                "toolTip": "The Azure AD group objectId which will be Synapse Administrator on Azure Synapse Workspace",
+                "placeholder": "Synapse Administrator AAD group objectId",
+                "visible": "[equals(steps('Analytics').synapseSection.synapseSource,'new')]",
+                "defaultValue": "",
+                "constraints": {
+                  "required": true,
+                  "validationMessage": "Please provide a valid GUID",
+                  "regex": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              }
+            ]
+          },
+          {
+            "name": "purviewSection",
+            "type": "Microsoft.Common.Section",
+            "label": "Azure purview",
+            "elements": [
+              {
+                "name": "synapseSQLAdminGroupInfo",
+                "type": "Microsoft.Common.InfoBox",
+                "options": {
+                  "icon": "Info",
+                  "text": "Select an existing Microsoft Purview account."
+                }
+              },
+              {
+                "name": "purviewSelector",
+                "type": "Microsoft.Solutions.ResourceSelector",
+                "label": "Integrate with an existing Purview",
+                "toolTip": "Select the Azure Purview instance that will receive configuration and data from the Enterprise Data Sharing Platform.",
+                "resourceType": "Microsoft.Purview/accounts",
+                "visible": true,
+                "constraints": {
+                  "required": true
+                },
+                "options": {
+                  "filter": {
+                    "subscription": "all",
+                    "location": "all"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "DataIntegrationServicePrincipal",
+            "type": "Microsoft.Common.Section",
+            "label": "Data Integration Service Principal",
+            "elements": [
+              {
+                "name": "DataIntegrationServicePrincipalGroupInfo",
+                "type": "Microsoft.Common.InfoBox",
+                "options": {
+                  "icon": "Info",
+                  "text": "Select an existing Service Principal that will be used by the Analytics package.<br />Data will be made available for analysis purposes using this identity.<br />It must be:<ul><li><strong>Reader</strong> on current subscription scope</li><br /><li><strong>Reader</strong> on Purview - if in a different subscription than the current one</li><br /><li>Member of the <strong>Synapse Administrator ADD</strong> group</li><br /><li><strong>Collection admins, Data source admins, Data curators and Data readers</strong> roles in the Microsoft Purview Governance Portal</li><br /><li>Granted the following Graph API delegated permissions:<p><ul><li><em>Applications.Read.All</em></li><li><em>Group.Read.All</em></li><li><em>User.Read.All</em></li><li><em>GroupMember.Read.All</em></li></ul></li></ul></p>"
+                },
+                "visible": "[equals(steps('Analytics').synapseSection.synapseSource,'new')]"
+              },
+              {
+                "name": "DataIntegrationServicePrincipalExistingSynGroupInfo",
+                "type": "Microsoft.Common.InfoBox",
+                "options": {
+                  "icon": "Info",
+                  "text": "Select an existing Service Principal that will be used by the Analytics package.<br />Data will be made available for analysis purposes using this identity.<br />It must be:<ul><li><strong>Reader</strong> on current subscription scope</li><br /><li><strong>Reader</strong> on Purview, Synapse and its default Data Lake - if in a different subscription than the current one</li><br /><li><strong>Synapse SQL Administrator</strong> role in the Synapse Workspace Studio</li><br /><li><strong>Collection admins, Data source admins, Data curators and Data readers</strong> roles in the Microsoft Purview Governance Portal</li><br /><li>Granted the following Graph API delegated permissions:<p><ul><li><em>Applications.Read.All</em></li><li><em>Group.Read.All</em></li><li><em>User.Read.All</em></li><li><em>GroupMember.Read.All</em></li></ul></li></ul></p>"
+                },
+                "visible": "[equals(steps('Analytics').synapseSection.synapseSource,'existing')]"
+              },
+              {
+                "name": "ServicePrincipal",
+                "type": "Microsoft.Common.ServicePrincipalSelector",
+                "label": {
+                  "password": "Client secret",
+                  "authenticationType": "Authentication type"
+                },
+                "toolTip": {
+                  "password": "A valid Client Secret associated to the selected Service Principal",
+                  "authenticationType": "Authentication type"
+                },
+                "defaultValue": {
+                  "principalId": "<default guid>",
+                  "name": "(New) default App Id"
+                },
+                "constraints": {
+                  "required": true,
+                  "regex": "^.{40}$",
+                  "validationMessage": "A valid Client Secret associated to the Service Principal must be provided"
+                },
+                "options": {
+                  "hideCertificate": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SPControl",
+        "label": "Service Principal",
+        "elements": [
+          {
+            "name": "SPControlGroupInfoPurviewWithCoManagedRGExisting",
+            "type": "Microsoft.Common.InfoBox",
+            "options": {
+              "icon": "Info",
+              "text": "Select an existing Service Principal that has <strong>Owner</strong> role on the resource group(s) chosen in <em>Agility/Analytics</em> tab.<br/><br/>The existing Service Principal needs also to be <strong>Reader</strong> on the Purview chosen in <em>Analytics</em> tab,<br/>if in a different subscription of the current one."
+            },
+            "visible": "[and(equals(steps('Analytics').synapseSection.synapseSource,'new'), equals(steps('Analytics').analyticsResourceGroupSection.analyticsResourceGroupType,'existing'))]"
+          },
+          {
+            "name": "SPControlGroupInfoPurviewWithCoManagedRGNew",
+            "type": "Microsoft.Common.InfoBox",
+            "options": {
+              "icon": "Info",
+              "text": "Select an existing Service Principal that has either <strong>Owner</strong> or <strong>Contributor and User Access Administrator</strong> role on<br/>the subscription chosen in <em>Basics</em> tab.<br/><br/>The existing Service Principal needs also to be <strong>Reader</strong> on the Purview chosen in <em>Analytics</em> tab,<br/>if in a different subscription of the current one."
+            },
+            "visible": "[and(equals(steps('Analytics').synapseSection.synapseSource,'new'), or(equals(steps('Analytics').analyticsResourceGroupSection.analyticsResourceGroupType,'new'), equals(steps('Agility').agilityResourceGroupSection.agilityResourceGroupType,'new')))]"
+          },
+          {
+            "name": "SPControlGroupInfoSynapseWithCoManagedRGExisting",
+            "type": "Microsoft.Common.InfoBox",
+            "options": {
+              "icon": "Info",
+              "text": "Select an existing Service Principal that has <strong>Owner</strong> role on the resource group(s) chosen in <em>Agility/Analytics</em> tab.<br/><br/>The existing Service Principal needs also to be <strong>Reader</strong> on the Purview, the Synapse and its default Data Lake<br/>chosen in <em>Analytics</em> tab - if in a different subscription of current one."
+            },
+            "visible": "[and(equals(steps('Analytics').synapseSection.synapseSource,'existing'), equals(steps('Analytics').analyticsResourceGroupSection.analyticsResourceGroupType,'existing'))]"
+          },
+          {
+            "name": "SPControlGroupInfoSynapseWithCoManagedRGNew",
+            "type": "Microsoft.Common.InfoBox",
+            "options": {
+              "icon": "Info",
+              "text": "Select an existing Service Principal that has either <strong>Owner</strong> or <strong>Contributor and User Access Administrator</strong> role on<br/>the subscription chosen in <em>Basics</em> tab.<br/><br/>The existing Service Principal needs also to be <strong>Reader</strong> on the Purview, the Synapse and its default Data Lake<br/>chosen in <em>Analytics</em> tab - if in a different subscription of current one."
+            },
+            "visible": "[and(equals(steps('Analytics').synapseSection.synapseSource,'existing'), or(equals(steps('Analytics').analyticsResourceGroupSection.analyticsResourceGroupType,'new'), equals(steps('Agility').agilityResourceGroupSection.agilityResourceGroupType,'new')))]"
+          },
+          {
+            "name": "ServicePrincipal",
+            "type": "Microsoft.Common.ServicePrincipalSelector",
+            "label": {
+              "password": "Client secret",
+              "authenticationType": "Authentication type",
+              "sectionHeader": "Installer Service Principal"
+            },
+            "toolTip": {
+              "password": "A valid Client Secret associated to the selected Service Principal",
+              "authenticationType": "Authentication type",
+              "sectionHeader": "This Service Principal will be used to create a new resource group on the selected subscription then deploy part of the platform on it. "
+            },
+            "defaultValue": {
+              "principalId": "<default guid>",
+              "name": "(New) default App Id"
+            },
+            "constraints": {
+              "required": true,
+              "regex": "^.{40}$",
+              "validationMessage": "A valid Client Secret associated to the Service Principal must be provided"
+            },
+            "options": {
+              "hideCertificate": true
+            },
+            "visible": true
+          }
+        ]
+      }
+    ],
+    "outputs": {
+      "location": "[location()]",
+      "environment": "[basics('environment')]",
+      "offerTier": "[basics('tier')]",
+      "principalClientId": "[steps('SPControl').ServicePrincipal.appId]",
+      "principalObjectId": "[first(steps('SPControl').ServicePrincipal.objectId)]",
+      "principalSecret": "[steps('SPControl').ServicePrincipal.password]",
+      "analyticsPrincipalClientId": "[steps('Analytics').DataIntegrationServicePrincipal.ServicePrincipal.appId]",
+      "analyticsPrincipalSecret": "[steps('Analytics').DataIntegrationServicePrincipal.ServicePrincipal.password]",
+      "analyticsPrincipalObjectId": "[first(steps('Analytics').DataIntegrationServicePrincipal.ServicePrincipal.objectId)]",
+      "customerTenantId": "[subscription().tenantId]",
+      "analytics": {
+        "useExistingCoManagedResourceGroup": "[equals(steps('Analytics').analyticsResourceGroupSection.analyticsResourceGroupType,'existing')]",
+        "coManagedResourceGroupName": "[coalesce(steps('Analytics').analyticsResourceGroupSection.analyticsResourceGroupSelector, '')]",
+        "useExistingSynapse": "[equals(steps('Analytics').synapseSection.synapseSource,'existing')]",
+        "synapseWorkspace": "[coalesce(steps('Analytics').synapseSection.synapseSelector.id, '')]",
+        "synapseSqlAdminGroupObjectId": "[coalesce(steps('Analytics').synapseSection.synapseSqlAdminGroupObjectId, '')]",
+        "withPurview": "[not(empty(steps('Analytics').purviewSection.purviewSelector.id))]",
+        "purviewResourceId": "[coalesce(steps('Analytics').purviewSection.purviewSelector.id, '')]",
+        "purviewName": "[coalesce(steps('Analytics').purviewSection.purviewSelector.name, '')]"
+      }
+    }
+  }
+}
