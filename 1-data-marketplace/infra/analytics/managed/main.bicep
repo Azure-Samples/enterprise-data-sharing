@@ -40,7 +40,7 @@ module func 'func.bicep' = {
     hostingPlanName: '${abbreviations.webServerFarms}${resourceInfix}-${kitIdentifier}-${resourceSuffix}'
     privateEndpointPrefix: abbreviations.networkPrivateEndpoints
     privateLinkServicePrefix: abbreviations.networkPrivateLinkServices
-    storageName: '${abbreviations.storageStorageAccounts}${resourceInfix}${kitIdentifier}${resourceSuffix}'
+    storageName: replace('${abbreviations.storageStorageAccounts}${resourceInfix}${kitIdentifier}${resourceSuffix}', '-', '')
     commonResourceTags: commonResourceTags
     appInsightsConnectionString: appInsightsConnectionString
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId

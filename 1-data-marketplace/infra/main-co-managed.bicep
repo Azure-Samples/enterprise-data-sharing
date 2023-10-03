@@ -3,7 +3,6 @@ targetScope = 'subscription'
 param location string = deployment().location
 param shortLocation string = ''
 param resourceSuffix string
-param analyticsEnabled bool
 param analyticsUseExistingCoManagedResourceGroup bool
 param analyticsExistingCoManagedResourceGroupName string
 param useExistingSynapse bool = false
@@ -38,11 +37,11 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10
   scope: resourceGroup(managedResourceGroupName)
 }
 
-module analyticsCoManaged 'analytics/co-managed/main.bicep' = if (analyticsEnabled) {
+module analyticsCoManaged 'analytics/co-managed/main.bicep' = {
   name: 'analytics-${resourceSuffix}-co-managed'
   params: {
     kitIdentifier: 'anc'
-    commonResourceTags: union(commonResourceTags, { mccp_kit: 'analytics' })
+    commonResourceTags: commonResourceTags
     location: location
     resourceInfix: resourceInfix
     resourceSuffix: resourceSuffix
@@ -65,9 +64,9 @@ module analyticsCoManaged 'analytics/co-managed/main.bicep' = if (analyticsEnabl
   }
 }
 
-output analyticsSynapseWorkspaceName string = analyticsEnabled ? analyticsCoManaged.outputs.synapseWorkspaceName : ''
-output analyticsSynapseWorkspaceResourceId string = analyticsEnabled ? analyticsCoManaged.outputs.synapseWorkspaceResourceId : ''
-output analyticsServiceProviderDatalakeName string = analyticsEnabled ? analyticsCoManaged.outputs.serviceProviderDatalakeName : ''
-output analyticsServiceProviderDatalakeResourceId string = analyticsEnabled ? analyticsCoManaged.outputs.serviceProviderDatalakeResourceId : ''
-output analyticsCoManagedResourceGroupName string = analyticsEnabled ? analyticsCoManaged.outputs.resourceGroupName : ''
-output analyticsKeyVaultName string = analyticsEnabled ? analyticsCoManaged.outputs.keyVaultName : ''
+output analyticsSynapseWorkspaceName string = analyticsCoManaged.outputs.synapseWorkspaceName
+output analyticsSynapseWorkspaceResourceId string = analyticsCoManaged.outputs.synapseWorkspaceResourceId
+output analyticsServiceProviderDatalakeName string = analyticsCoManaged.outputs.serviceProviderDatalakeName
+output analyticsServiceProviderDatalakeResourceId string = analyticsCoManaged.outputs.serviceProviderDatalakeResourceId
+output analyticsCoManagedResourceGroupName string = analyticsCoManaged.outputs.resourceGroupName
+output analyticsKeyVaultName string = analyticsCoManaged.outputs.keyVaultName

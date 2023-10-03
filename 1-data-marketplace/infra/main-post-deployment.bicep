@@ -1,6 +1,5 @@
 param location string = resourceGroup().location
 param shortLocation string = ''
-param analyticsEnabled bool
 param resourceSuffix string
 param useExistingSynapse bool
 param analyticsSynapseWorkspaceResourceId string
@@ -21,11 +20,11 @@ var commonResourceTags = {
 }
 
 var resourceInfix = '${shortLocation}-${environment}'
-module analyticsPostDeployment 'analytics/post-deployment/main.bicep' = if (analyticsEnabled) {
+module analyticsPostDeployment 'analytics/post-deployment/main.bicep' = {
   name: 'analytics-post-deployment'
 
   params: {
-    commonResourceTags: union(commonResourceTags, { mccp_kit: 'analytics' })
+    commonResourceTags: commonResourceTags
     location: location
     resourceInfix: resourceInfix
     resourceSuffix: resourceSuffix

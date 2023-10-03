@@ -133,7 +133,7 @@ module cluster 'aks.bicep' = {
 module serviceProviderIdentity 'identity.bicep' = {
   name: 'foundation-identity'
   params: {
-    name: '${abbreviations.managedIdentityUserAssignedIdentities}${resourceInfix}-svcpro-${resourceSuffix}'
+    name: '${abbreviations.managedIdentityUserAssignedIdentities}${resourceInfix}-${kitIdentifier}-svcpro-${resourceSuffix}'
   }
 }
 

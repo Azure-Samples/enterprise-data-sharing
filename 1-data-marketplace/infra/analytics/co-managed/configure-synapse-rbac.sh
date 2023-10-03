@@ -35,7 +35,7 @@ do
     set +e
     synapseAdminRoleAssignment=$(az synapse role assignment list --workspace-name "${workspaceName}" \
             --assignee-object-id "${sqlAdminGroupObjectId}" \
-            --role "Synapse Administrator")
+            --role "6e4bf58a-b8e1-4cc3-bbf9-d73143322b78")
     if [ $? -eq 0 ]
     then
         echo "### role assignment found, parsing its id"
