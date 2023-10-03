@@ -225,7 +225,7 @@
                 "name": "synapseSelector",
                 "type": "Microsoft.Solutions.ResourceSelector",
                 "label": "Select Synapse",
-                "toolTip": "Select the Azure Synapse instance that will receive configuration and data from the Creation Platform",
+                "toolTip": "Select the Azure Synapse instance that will receive configuration and data from the Enterprise Data Sharing Platform",
                 "resourceType": "Microsoft.Synapse/workspaces",
                 "visible": "[equals(steps('Analytics').synapseSection.synapseSource,'existing')]",
                 "options": {
