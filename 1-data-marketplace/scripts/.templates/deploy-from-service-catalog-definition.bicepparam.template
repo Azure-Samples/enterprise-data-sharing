@@ -1,0 +1,27 @@
+using './deploy-from-service-catalog-definition.bicep'
+
+param applicationDefinitionResourceId = ''
+param location = 'westeurope'
+param environment = 'tst'
+param offerTier = 'standard'
+param principalClientId = ''
+param principalObjectId = ''
+param principalSecret = ''
+param analyticsPrincipalClientId = ''
+param analyticsPrincipalObjectId = ''
+param analyticsPrincipalSecret = ''
+param customerTenantId = ''
+param analytics = {
+  useExistingCoManagedResourceGroup: false
+  coManagedResourceGroupName: ''
+  useExistingSynapse: false
+  synapseWorkspace: ''
+  synapseSqlAdminGroupObjectId: ''
+  withPurview: true
+  purviewResourceId: ''
+  purviewName: ''
+}
+param crossTenant = false
+param applicationResourceName = ''
+param managedResourceGroupId = ''
+
