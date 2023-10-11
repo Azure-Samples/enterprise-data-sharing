@@ -1,8 +1,8 @@
 @description('The location of the resources deployed. Default to same as resource group')
 param location string = resourceGroup().location
 param shortLocation string = ''
-@secure()
-param jumpServerAdminPassword string
+// @secure()
+// param jumpServerAdminPassword string
 @allowed([
   'tst'
   'prd'
@@ -21,7 +21,7 @@ module foundation 'foundation/main.bicep' = {
 
   params: {
     kitIdentifier: 'fnd'
-    jumpServerAdminPassword: jumpServerAdminPassword
+    // jumpServerAdminPassword: jumpServerAdminPassword
     location: location
     resourceInfix: resourceInfix
     vaultName: vaultName

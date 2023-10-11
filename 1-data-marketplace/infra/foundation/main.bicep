@@ -6,9 +6,9 @@ param location string
 param resourceInfix string
 @description('The suffix to append to the resources names. Default to resource group name')
 param resourceSuffix string
-@secure()
-@description('The password for the jumpbox')
-param jumpServerAdminPassword string
+// @secure()
+// @description('The password for the jumpbox')
+// param jumpServerAdminPassword string
 param vaultName string
 param commonResourceTags object
 @description('The offer tier')
@@ -97,21 +97,21 @@ module bastion 'bastion.bicep' = {
   }
 }
 
-module jumpServer 'jumpbox.bicep' = {
-  name: 'foundation-aks-jumpbox'
-  params: {
-    name: '${abbreviations.computeVirtualMachines}-${resourceInfix}-${kitIdentifier}-jmpbx-${resourceSuffix}'
-    location: location
-    nicName: '${abbreviations.networkNetworkInterfaces}${resourceInfix}-${kitIdentifier}-jmpbx-${resourceSuffix}'
-    adminPassword: jumpServerAdminPassword
-    subnetId: network.outputs.jumpboxSubnetId
-    logAnalyticsWorkspaceId: monitoring.outputs.logAnalyticsWorkspaceId
-    commonResourceTags: commonResourceTags
-    keyVaultName: vaultName
-    encryptionKeyUri: encryption.outputs.vmEncryptionKeyUri
-    vmSize: offerTierConfiguration[offerTier].jumpboxSize
-  }
-}
+// module jumpServer 'jumpbox.bicep' = {
+//   name: 'foundation-aks-jumpbox'
+//   params: {
+//     name: '${abbreviations.computeVirtualMachines}-${resourceInfix}-${kitIdentifier}-jmpbx-${resourceSuffix}'
+//     location: location
+//     nicName: '${abbreviations.networkNetworkInterfaces}${resourceInfix}-${kitIdentifier}-jmpbx-${resourceSuffix}'
+//     adminPassword: jumpServerAdminPassword
+//     subnetId: network.outputs.jumpboxSubnetId
+//     logAnalyticsWorkspaceId: monitoring.outputs.logAnalyticsWorkspaceId
+//     commonResourceTags: commonResourceTags
+//     keyVaultName: vaultName
+//     encryptionKeyUri: encryption.outputs.vmEncryptionKeyUri
+//     vmSize: offerTierConfiguration[offerTier].jumpboxSize
+//   }
+// }
 
 module cluster 'aks.bicep' = {
   name: 'foundation-aks-cluster'

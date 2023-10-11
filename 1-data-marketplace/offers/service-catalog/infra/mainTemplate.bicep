@@ -150,6 +150,30 @@ resource spIdentityIsKvAdministrator 'Microsoft.Authorization/roleAssignments@20
   }
 }
 
+module foundation '../../../infra/main.bicep' = {
+  name: 'managed-scope'
+  dependsOn: [
+    vault
+    deploymentSPClientSecret
+    deploymentSPClientIdKvSecret
+    deploymentSPObjectIdKvSecret
+    customerTenantIdKvSecret
+    serviceProviderIdentity
+    spIdentityIsOwnerOfManagedRg
+    spIdentityIsKvAdministrator
+    analyticsClientIdKvSecret
+    analyticsObjectIdKvSecret
+    analyticsSPClientSecret
+  ]
+  params: {
+    crossTenant: crossTenant
+    location: location
+    environment: environment
+    offerTier: offerTier
+    shortLocation: shortLocation
+  }
+}
+
 output shortLocation string = shortLocation
 output offerTier string = offerTier
 output analytics object = analytics
