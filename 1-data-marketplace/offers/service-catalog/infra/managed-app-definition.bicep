@@ -9,9 +9,6 @@ param notificationEndpointUri string
 param devopsServicePrincipalGroupPrincipalId string
 @description('The AAD group object ID corresponding to service principals which will be Key Vault Secrets User on the managed resource groups')
 param keyVaultDevopsServicePrincipalGroupPrincipalId string
-@description('The environment code')
-@allowed([ 'tst', 'prd' ])
-param environmentCode string
 
 var ownerRoleId = '8e3af657-a8ff-443c-a75c-2fe8c4bcb635'
 var keyVaultSecretUsersRoleId = '4633458b-17de-408a-b874-0445c86b69e6'
@@ -22,8 +19,8 @@ resource managedApplicationDefinition 'Microsoft.Solutions/applicationDefinition
 
   properties: {
     lockLevel: 'ReadOnly'
-    description: 'This is the Enterprise Data Sharing offer for single tenant usage (${environmentCode})'
-    displayName: 'Enterprise Data Sharing single tenant offer (${environmentCode})'
+    description: 'This is the Enterprise Data Sharing offer for single tenant usage'
+    displayName: 'Enterprise Data Sharing single tenant offer'
     createUiDefinition: loadJsonContent('createUiDefinition.json')
     mainTemplate: loadJsonContent('mainTemplate.json') // NOTE: generated at build time
     authorizations: [

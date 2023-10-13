@@ -178,3 +178,6 @@ output shortLocation string = shortLocation
 output offerTier string = offerTier
 output analytics object = analytics
 output resourceSuffix string = resourceSuffix
+output foundationLogAnalyticsName string = foundation.outputs.foundationLogAnalyticsWorkspaceName
+output analyticsFunctionAppName string = foundation.outputs.analyticsFunctionAppName
+output analyticsDataShareName string = foundation.outputs.analyticsDataShareName

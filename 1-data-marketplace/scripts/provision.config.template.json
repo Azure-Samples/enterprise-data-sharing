@@ -1,0 +1,43 @@
+{
+    "global": {
+        "azureLocation": "{azureLocation}",
+        "subscriptionId": "{subscriptionId}"
+    },
+    "definition": {
+        "resourceGroupName": "{resourceGroupName}",
+        "notificationEndpointUri": "{notificationEndpointUri}",
+        "devopsEntraGroupObjectId": "{devopsEntraGroupObjectId}",
+        "keyvaultUserGroupObjectId": "{keyvaultUserGroupObjectId}"
+    },
+    "ama": {
+        "resourceGroupName": "{resourceGroupName}",
+        "analytics": {
+            "useExistingCoManagedResourceGroup": {useExistingCoManagedResourceGroup},
+            "existingCoManagedResourceGroupName": "{existingCoManagedResourceGroupName}",
+            "useExistingSynapse": {useExistingSynapse},
+            "existingSynapseWorkspaceResourceId": "{existingSynapseWorkspaceResourceId}",
+            "identity": {
+                "objectId": "{analyticsIdentityObjectId}",
+                "clientId": "{analyticsIdentityClientId}",
+                "clientSecret": "{analyticsIdentityClientSecret}"
+            },
+            "useExistingPurview": {useExistingPurview},
+            "purviewName": "{purviewName}",
+            "purviewResourceId": "{purviewResourceId}",
+            "synapseSqlAdminGroupObjectId": "{synapseSqlAdminGroupObjectId}"
+        },
+        "subOwner": {
+            "identity": {
+                "clientId": "{subOwnerIdentityClientId}",
+                "objectId": "{subOwnerIdentityObjectId}",
+                "clientSecret": "{subOwnerIdentityClientSecret}"
+            }
+        },
+        "environment": "{environment}",
+        "managedResourceGroupName": "{managedResourceGroupName}",
+        "offerTier": "{offerTier}",
+        "crossTenant": {crossTenant},
+        "name": "{amaName}",
+        "tenantId": "{tenantId}"
+    }
+}

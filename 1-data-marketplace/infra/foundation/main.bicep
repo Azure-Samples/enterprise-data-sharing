@@ -84,18 +84,18 @@ module firewall 'firewall.bicep' = {
   }
 }
 
-module bastion 'bastion.bicep' = {
-  name: 'foundation-bastion'
-  params: {
-    name: '${abbreviations.networkBastionHosts}${resourceInfix}-${kitIdentifier}-jmpbx-${resourceSuffix}'
-    publicIpName: '${abbreviations.networkPublicIPAddresses}${resourceInfix}-${kitIdentifier}-bas-${resourceSuffix}'
-    commonResourceTags: commonResourceTags
-    subnetId: network.outputs.bastionSubnetId
-    location: location
-    logAnalyticsWorkspaceId: monitoring.outputs.logAnalyticsWorkspaceId
-    skuName: offerTierConfiguration[offerTier].bastionSkuName
-  }
-}
+// module bastion 'bastion.bicep' = {
+//   name: 'foundation-bastion'
+//   params: {
+//     name: '${abbreviations.networkBastionHosts}${resourceInfix}-${kitIdentifier}-jmpbx-${resourceSuffix}'
+//     publicIpName: '${abbreviations.networkPublicIPAddresses}${resourceInfix}-${kitIdentifier}-bas-${resourceSuffix}'
+//     commonResourceTags: commonResourceTags
+//     subnetId: network.outputs.bastionSubnetId
+//     location: location
+//     logAnalyticsWorkspaceId: monitoring.outputs.logAnalyticsWorkspaceId
+//     skuName: offerTierConfiguration[offerTier].bastionSkuName
+//   }
+// }
 
 // module jumpServer 'jumpbox.bicep' = {
 //   name: 'foundation-aks-jumpbox'
@@ -113,22 +113,22 @@ module bastion 'bastion.bicep' = {
 //   }
 // }
 
-module cluster 'aks.bicep' = {
-  name: 'foundation-aks-cluster'
-  params: {
-    name: '${abbreviations.containerServiceManagedClusters}${resourceInfix}-${kitIdentifier}-github-${resourceSuffix}'
-    kubeletIdentityName: '${abbreviations.managedIdentityUserAssignedIdentities}${resourceInfix}-${kitIdentifier}-k8-${resourceSuffix}'
-    aksIdentityName: '${abbreviations.managedIdentityUserAssignedIdentities}${resourceInfix}-${kitIdentifier}-aks-${resourceSuffix}'
-    commonResourceTags: commonResourceTags
-    resourceSuffix: resourceSuffix
-    location: location
-    subnetID: network.outputs.aksSubnetId
-    logAnalyticsWorkspaceId: monitoring.outputs.logAnalyticsWorkspaceId
-    skuName: offerTierConfiguration[offerTier].aksSkuName
-    skuTier: offerTierConfiguration[offerTier].aksSkuTier
-    crossTenant: crossTenant
-  }
-}
+// module cluster 'aks.bicep' = {
+//   name: 'foundation-aks-cluster'
+//   params: {
+//     name: '${abbreviations.containerServiceManagedClusters}${resourceInfix}-${kitIdentifier}-github-${resourceSuffix}'
+//     kubeletIdentityName: '${abbreviations.managedIdentityUserAssignedIdentities}${resourceInfix}-${kitIdentifier}-k8-${resourceSuffix}'
+//     aksIdentityName: '${abbreviations.managedIdentityUserAssignedIdentities}${resourceInfix}-${kitIdentifier}-aks-${resourceSuffix}'
+//     commonResourceTags: commonResourceTags
+//     resourceSuffix: resourceSuffix
+//     location: location
+//     subnetID: network.outputs.aksSubnetId
+//     logAnalyticsWorkspaceId: monitoring.outputs.logAnalyticsWorkspaceId
+//     skuName: offerTierConfiguration[offerTier].aksSkuName
+//     skuTier: offerTierConfiguration[offerTier].aksSkuTier
+//     crossTenant: crossTenant
+//   }
+// }
 
 module serviceProviderIdentity 'identity.bicep' = {
   name: 'foundation-identity'
@@ -162,4 +162,4 @@ output vnetId string = network.outputs.vnetId
 output uamiEncryptionResourceId string = encryption.outputs.uamiEncryptionResourceId
 output keyVaultUri string = encryption.outputs.keyVaultUri
 output encryptionKeyName string = encryption.outputs.storageEncryptionKeyName
-output clusterName string = cluster.outputs.clusterName
+// output clusterName string = cluster.outputs.clusterName

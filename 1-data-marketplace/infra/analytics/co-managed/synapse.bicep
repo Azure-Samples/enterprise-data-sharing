@@ -3,7 +3,6 @@ param commonResourceTags object
 param customerClientId string
 @secure()
 param customerClientSecret string
-param withPurview bool
 param purviewResourceId string
 param purviewPrincipalId string
 param keyVaultName string
@@ -81,7 +80,7 @@ resource primary 'Microsoft.Storage/storageAccounts/blobServices/containers@2022
 }
 
 var storageBlobDataReaderRole = '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
-resource purviewIsBlobDataReaderOnAnalyticsCoManagedDatalake 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (withPurview) {
+resource purviewIsBlobDataReaderOnAnalyticsCoManagedDatalake 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(synapseDatalake.id, purviewPrincipalId, storageBlobDataReaderRole)
   scope: synapseDatalake
 
@@ -94,7 +93,7 @@ resource purviewIsBlobDataReaderOnAnalyticsCoManagedDatalake 'Microsoft.Authoriz
 }
 
 var readerRoleId = 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
-resource purviewIsReaderOnAnalyticsCoManagedDatalake 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (withPurview) {
+resource purviewIsReaderOnAnalyticsCoManagedDatalake 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(synapseDatalake.id, purviewPrincipalId, readerRoleId)
   scope: synapseDatalake
 
@@ -175,9 +174,9 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
     trustedServiceBypassEnabled: true
     azureADOnlyAuthentication: true
 
-    purviewConfiguration: withPurview ? {
+    purviewConfiguration: {
       purviewResourceId: purviewResourceId
-    } : null
+    }
 
     encryption: {
       cmk: {
@@ -248,7 +247,7 @@ resource configSynapseWithDatalake 'Microsoft.Resources/deploymentScripts@2020-1
       }
       {
         name: 'clientId'
-        secureValue: customerClientId
+        value: customerClientId
       }
       {
         name: 'clientSecret'
@@ -256,7 +255,7 @@ resource configSynapseWithDatalake 'Microsoft.Resources/deploymentScripts@2020-1
       }
       {
         name: 'tenantId'
-        secureValue: tenant().tenantId
+        value: tenant().tenantId
       }
     ]
     scriptContent: loadTextContent('add-config-synapse.sh')
@@ -277,11 +276,11 @@ resource configureSynapseRbac 'Microsoft.Resources/deploymentScripts@2020-10-01'
     environmentVariables: [
       {
         name: 'customerClientId'
-        secureValue: customerClientId
+        value: customerClientId
       }
       {
         name: 'customerClientSecret'
-        secureValue: customerClientSecret
+        value: customerClientSecret
       }
       {
         name: 'customerTenantId'
@@ -308,7 +307,7 @@ resource configureSynapseRbac 'Microsoft.Resources/deploymentScripts@2020-10-01'
   }
 }
 
-resource purviewIsReaderOnSynapse 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (withPurview) {
+resource purviewIsReaderOnSynapse 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(synapseWorkspace.id, purviewPrincipalId, readerRoleId)
   scope: synapseWorkspace
 

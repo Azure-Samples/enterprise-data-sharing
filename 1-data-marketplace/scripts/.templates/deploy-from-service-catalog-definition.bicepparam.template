@@ -17,7 +17,7 @@ param analytics = {
   useExistingSynapse: false
   synapseWorkspace: ''
   synapseSqlAdminGroupObjectId: ''
-  withPurview: true
+  useExistingPurview: false
   purviewResourceId: ''
   purviewName: ''
 }

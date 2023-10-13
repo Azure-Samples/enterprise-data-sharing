@@ -5,7 +5,6 @@ param customerClientId string
 @secure()
 param customerClientSecret string
 param synapsePrincipalId string
-param withPurview bool
 param purviewPrincipalId string
 param uamiEncryptionResourceId string
 param keyVaultUri string
@@ -128,7 +127,7 @@ resource configSynapseWithServiceProviderDatalake 'Microsoft.Resources/deploymen
 }
 
 var storageBlobDataReaderRole = '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
-resource purviewIsBlobDataReaderOnAnalyticsCoManagedServiceProviderDatalake 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (withPurview) {
+resource purviewIsBlobDataReaderOnAnalyticsCoManagedServiceProviderDatalake 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(serviceProviderDataLake.id, purviewPrincipalId, storageBlobDataReaderRole)
   scope: serviceProviderDataLake
   properties: {
@@ -139,7 +138,7 @@ resource purviewIsBlobDataReaderOnAnalyticsCoManagedServiceProviderDatalake 'Mic
 }
 
 var dataLakeReaderRole = 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
-resource purviewIsReaderOnAnalyticsCoManagedServiceProviderDatalake 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (withPurview) {
+resource purviewIsReaderOnAnalyticsCoManagedServiceProviderDatalake 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(serviceProviderDataLake.id, purviewPrincipalId, dataLakeReaderRole)
   scope: serviceProviderDataLake
   properties: {

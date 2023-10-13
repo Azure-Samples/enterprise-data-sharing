@@ -11,7 +11,7 @@ param customerClientId string = ''
 param analyticsPrincipalObjectId string = ''
 @secure()
 param customerClientSecret string = ''
-param withAnalyticsPurview bool = false
+param analyticsUseExistingPurview bool = false
 param analyticsPurviewPrincipalId string = ''
 param analyticsPurviewResourceId string = ''
 param analyticsSynapseSqlAdminGroupObjectId string = ''
@@ -51,7 +51,7 @@ module analyticsCoManaged 'analytics/co-managed/main.bicep' = {
     customerClientId: customerClientId
     analyticsPrincipalObjectId: analyticsPrincipalObjectId
     customerClientSecret: customerClientSecret
-    withPurview: withAnalyticsPurview
+    useExistingPurview: analyticsUseExistingPurview
     purviewPrincipalId: analyticsPurviewPrincipalId
     purviewResourceId: analyticsPurviewResourceId
     managedResourceGroupName: managedResourceGroupName

@@ -8,21 +8,18 @@ param devopsServicePrincipalGroupPrincipalId string
 @description('The AAD group object ID corresponding to service principals which will be Key Vault Secrets User on the managed resource groups')
 param keyVaultDevopsServicePrincipalGroupPrincipalId string
 @description('The environment code')
-@allowed([ 'tst', 'prd' ])
-param environmentCode string
 param now string = utcNow('yyyyMMddTHHmmss')
 
 var abbreviations = loadJsonContent('../../../abbreviations.json')
 
 module managedAppDefinition 'managed-app-definition.bicep' = {
-  name: 'managed-app-definition-${environmentCode}-${now}'
+  name: 'managed-app-definition-${now}'
   params: {
-    name: '${abbreviations.solutionsApplicationDefinitions}eds-sample-${environmentCode}'
+    name: '${abbreviations.solutionsApplicationDefinitions}eds-sample'
     location: location
     notificationEndpointUri: notificationEndpointUri
     devopsServicePrincipalGroupPrincipalId: devopsServicePrincipalGroupPrincipalId
     keyVaultDevopsServicePrincipalGroupPrincipalId: keyVaultDevopsServicePrincipalGroupPrincipalId
-    environmentCode: environmentCode
   }
 }
 

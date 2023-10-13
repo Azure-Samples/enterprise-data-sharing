@@ -5,15 +5,15 @@ param kitIdentifier string
 param location string = deployment().location
 @description('The suffix to append to the resources names. Composed of the short location and the environment')
 param resourceInfix string
-param purviewPrincipalId string
+param purviewPrincipalId string = ''
 param resourceSuffix string
 param customerClientId string
 @secure()
 param customerClientSecret string
 param analyticsPrincipalObjectId string
-param purviewResourceId string
+param purviewResourceId string = ''
 param useExistingSynapse bool
-param withPurview bool
+param useExistingPurview bool
 param synapseWorkspaceResourceId string
 param commonResourceTags object
 param synapseSqlAdminGroupObjectId string
@@ -84,9 +84,8 @@ module synapse 'synapse.bicep' = if (!useExistingSynapse) {
     location: location
     customerClientId: customerClientId
     customerClientSecret: customerClientSecret
-    withPurview: withPurview
-    purviewResourceId: purviewResourceId
-    purviewPrincipalId: purviewPrincipalId
+    purviewResourceId: useExistingPurview ? purviewResourceId : purview.outputs.id
+    purviewPrincipalId: useExistingPurview ? purviewPrincipalId : purview.outputs.principalId
     keyVaultName: keyvault.outputs.keyVaultName
     uamiEncryptionResourceId: encryption.outputs.uamiEncryptionResourceId
     commonResourceTags: commonResourceTags
@@ -137,8 +136,7 @@ module datalakeClient 'client-datalake.bicep' = {
     useExistingSynapse: useExistingSynapse
     synapseWorkspaceName: !empty(synapseWorkspaceResourceId) ? synapseExisting.outputs.workspaceName : synapse.outputs.workspaceName
     synapsePrincipalId: !empty(synapseWorkspaceResourceId) ? synapseExisting.outputs.principalId : synapse.outputs.principalId
-    withPurview: withPurview
-    purviewPrincipalId: purviewPrincipalId
+    purviewPrincipalId: useExistingPurview ? purviewPrincipalId : purview.outputs.principalId
     keyVaultUri: keyvault.outputs.keyVaultUri
     encryptionKeyName: encryption.outputs.encryptionKeyName
     uamiEncryptionResourceId: encryption.outputs.uamiEncryptionResourceId
@@ -160,8 +158,7 @@ module serviveProviderDatalake 'service-provider-datalake.bicep' = {
     useExistingSynapse: useExistingSynapse
     synapseWorkspaceName: !empty(synapseWorkspaceResourceId) ? synapseExisting.outputs.workspaceName : synapse.outputs.workspaceName
     synapsePrincipalId: !empty(synapseWorkspaceResourceId) ? synapseExisting.outputs.principalId : synapse.outputs.principalId
-    withPurview: withPurview
-    purviewPrincipalId: purviewPrincipalId
+    purviewPrincipalId: useExistingPurview ? purviewPrincipalId : purview.outputs.principalId
     keyVaultUri: keyvault.outputs.keyVaultUri
     encryptionKeyName: encryption.outputs.encryptionKeyName
     uamiEncryptionResourceId: encryption.outputs.uamiEncryptionResourceId
@@ -170,6 +167,16 @@ module serviveProviderDatalake 'service-provider-datalake.bicep' = {
     datasharePrincipalId: managedResources.outputs.dataSharePrincipalId
     functionAppPrincipalId: managedResources.outputs.functionAppPrincipalId
     skuName: offerTierConfiguration[offerTier].serviceProviderDatalakeSkuName
+  }
+}
+
+module purview 'purview.bicep' = if (useExistingPurview == false) {
+  scope: resourceGroup(identifiedCoManagedResourceGroupName)
+  name: 'analytics-co-managed-purview'
+  params: {
+    location: location
+    name: '${abbreviations.purviewAccounts}${resourceInfix}-${kitIdentifier}-${resourceSuffix}'
+    tags: commonResourceTags
   }
 }
 

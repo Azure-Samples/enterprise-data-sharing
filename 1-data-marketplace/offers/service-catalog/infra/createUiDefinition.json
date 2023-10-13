@@ -268,12 +268,32 @@
                 }
               },
               {
+                "name": "purviewSource",
+                "type": "Microsoft.Common.OptionsGroup",
+                "label": "Select Synapse workspace source",
+                "toolTip": "If you have an existing Purview account, you still can install a new one dedicated for the Enterprise Data Sharing Platform.",
+                "constraints": {
+                  "allowedValues": [
+                    {
+                      "label": "Install a new Purview account",
+                      "value": "new"
+                    },
+                    {
+                      "label": "Use an existing Purview account",
+                      "value": "existing"
+                    }
+                  ],
+                  "required": true
+                },
+                "visible": true
+              },
+              {
                 "name": "purviewSelector",
                 "type": "Microsoft.Solutions.ResourceSelector",
                 "label": "Integrate with an existing Purview",
                 "toolTip": "Select the Azure Purview instance that will receive configuration and data from the Enterprise Data Sharing Platform.",
                 "resourceType": "Microsoft.Purview/accounts",
-                "visible": true,
+                "visible": "[equals(steps('Analytics').purviewSection.purviewSource, 'existing')]",
                 "constraints": {
                   "required": true
                 },
@@ -425,7 +445,7 @@
         "useExistingSynapse": "[equals(steps('Analytics').synapseSection.synapseSource,'existing')]",
         "synapseWorkspace": "[coalesce(steps('Analytics').synapseSection.synapseSelector.id, '')]",
         "synapseSqlAdminGroupObjectId": "[coalesce(steps('Analytics').synapseSection.synapseSqlAdminGroupObjectId, '')]",
-        "withPurview": "[not(empty(steps('Analytics').purviewSection.purviewSelector.id))]",
+        "useExistingPurview": "[equals(steps('Analytics').purviewSection.purviewSource, 'existing')]",
         "purviewResourceId": "[coalesce(steps('Analytics').purviewSection.purviewSelector.id, '')]",
         "purviewName": "[coalesce(steps('Analytics').purviewSection.purviewSelector.name, '')]"
       }
