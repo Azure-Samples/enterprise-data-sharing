@@ -52,11 +52,6 @@ resource_group_name="$(jq -r '.ama.resourceGroupName' <<< "$config")"
 echo "Creating resource group: $resource_group_name"
 az group create --name "$resource_group_name" --location "$(jq -r '.global.azureLocation' <<< "$config")"
 
-# Create resource group for managed resource group
-resource_group_name="$(jq -r '.ama.managedResourceGroupName' <<< "$config")" 
-echo "Creating resource group: $resource_group_name"
-az group create --name "$resource_group_name" --location "$(jq -r '.global.azureLocation' <<< "$config")"
-
 # Create resource group for co-managed resource group
 useExistingCoManagedResourceGroup=$(jq -r '.ama.analytics.useExistingCoManagedResourceGroup' <<< "$config")
 if [ "$useExistingCoManagedResourceGroup" = "false" ] ; then
