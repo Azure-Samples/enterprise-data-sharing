@@ -65,6 +65,7 @@ module analyticsCoManaged 'analytics/co-managed/main.bicep' = {
 }
 
 output analyticsSynapseWorkspaceName string = analyticsCoManaged.outputs.synapseWorkspaceName
+output analyticsPurviewResourceName string = analyticsCoManaged.outputs.purviewResourceName
 output analyticsSynapseWorkspaceResourceId string = analyticsCoManaged.outputs.synapseWorkspaceResourceId
 output analyticsServiceProviderDatalakeName string = analyticsCoManaged.outputs.serviceProviderDatalakeName
 output analyticsServiceProviderDatalakeResourceId string = analyticsCoManaged.outputs.serviceProviderDatalakeResourceId
