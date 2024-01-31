@@ -111,7 +111,7 @@ useExistingPurview=$(jq -r '.ama.analytics.useExistingPurview' <<< "$config")
 analyticsPurviewPrincipalId=""
 if [ "$useExistingPurview" = "true" ] ; then
     purviewResourceId=$(jq -r '.ama.analytics.purviewResourceId' <<< "$config")
-    az resource show --id "$purviewResourceId" -o tsv --query 'identity.principalId'
+    analyticsPurviewPrincipalId=$(az resource show --id "$purviewResourceId" -o tsv --query 'identity.principalId')
 else
     analyticsPurviewPrincipalId=$(jq -r '.ama.analytics.identity.objectId' <<< "$config")
 fi
@@ -133,6 +133,10 @@ coManagedDeployment=$(az deployment sub create -n "eds-co-managed" \
 )
 
 echo "$coManagedDeployment"
+
+purviewResourceName=$(echo "$coManagedDeployment" | jq -r '.properties.outputs.analyticsPurviewResourceName.value')
+echo "$purviewResourceName"
+
 echo "[✅] Deployment of the Co-Managed scope completed."
 
 echo "[ℹ️] Building parameters of the Post-Deployment-Managed scope..."
@@ -170,4 +174,45 @@ az deployment group create -n "eds-post-deployment" \
     --template-file ../infra/main-post-deployment.bicep \
     --parameters "$postDeploymentParameters"
 echo "[✅] Deployment of the Post-Deployment-Managed scope completed."
+
+
+echo "[ℹ️] Starting permission assignment for the Data Services Data Planes..."
+#####################################################
+# Purview
+
+ useExistingPurview="$(jq -r '.ama.analytics.useExistingPurview' <<< "$config")"
+ if [ "$useExistingPurview" = "true" ] ; then
+      purviewResourceName=$(jq -r '.ama.analytics.purviewName' <<< "$config")
+ fi
+
+# Retrieve signed-in-user
+owner_object_id=$(az ad signed-in-user show --output json | jq -r '.id')
+co_managed_resource_group_name=$(jq -r '.ama.analytics.existingCoManagedResourceGroupName' <<< "$config")
+
+# Add signed-in user to root collection
+az purview account add-root-collection-admin --account-name "$purviewResourceName" --resource-group "$co_managed_resource_group_name" --object-id "$owner_object_id"
+
+# Allow Reader to current subscription for analyticsPrincipalObjectId
+az role assignment create --role "Reader" --assignee "${analyticsPrincipalObjectId}" --scope "/subscriptions/${subscriptionId}" -o none
+
+# Grant SP Collection Administration, Data Source Administrator, Data Reader and Data Curator in Purview
+echo "Grant SP Collection Administration, Data Source Administrator and Data Curator in Purview"
+purview_access_token=$(az account get-access-token --resource https://purview.azure.net/ --query accessToken --output tsv)
+
+for metadatarole in purviewmetadatarole_builtin_collection-administrator purviewmetadatarole_builtin_data-source-administrator purviewmetadatarole_builtin_data-curator purviewmetadatarole_builtin_purview-reader; do  
+    body1=$(curl -s -H "Authorization: Bearer $purview_access_token" "https://${purviewResourceName}.purview.azure.com/policystore/collections/${purviewResourceName}/metadataPolicy?api-version=2021-07-01")
+    metadata_policy_id=$(echo "$body1" | jq -r '.id')
+    purviewMetadataPolicyUri="https://${purviewResourceName}.purview.azure.com/policystore/metadataPolicies/${metadata_policy_id}?api-version=2021-07-01"
+
+    body2=$(echo "$body1" | 
+        jq --arg perm "${metadatarole}" --arg objectid "${analyticsPrincipalObjectId}" '(.properties.attributeRules[] | 
+            select(.id | contains($perm)) | 
+                .dnfCondition[][] | 
+                    select(.attributeName == "principal.microsoft.id") | 
+                        .attributeValueIncludedIn) += [$objectid]')
+
+    curl -H "Authorization: Bearer $purview_access_token" -H "Content-Type: application/json" -d "$body2" -X PUT -i -s "${purviewMetadataPolicyUri}" > /dev/null
+done
+
+
 

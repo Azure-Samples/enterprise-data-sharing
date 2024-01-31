@@ -20,3 +20,4 @@ resource purview 'Microsoft.Purview/accounts@2021-12-01' = {
 
 output id string = purview.id
 output principalId string = purview.identity.principalId
+output purviewName string = purview.name

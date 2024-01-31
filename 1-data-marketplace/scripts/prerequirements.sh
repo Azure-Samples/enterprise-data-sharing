@@ -53,12 +53,9 @@ echo "Creating resource group: $resource_group_name"
 az group create --name "$resource_group_name" --location "$(jq -r '.global.azureLocation' <<< "$config")"
 
 # Create resource group for co-managed resource group
-useExistingCoManagedResourceGroup=$(jq -r '.ama.analytics.useExistingCoManagedResourceGroup' <<< "$config")
-if [ "$useExistingCoManagedResourceGroup" = "false" ] ; then
-    resource_group_name=$(jq -r '.ama.analytics.existingCoManagedResourceGroupName' <<< "$config")
-    echo "Creating resource group: $resource_group_name"
-    az group create --name "$resource_group_name" --location "$(jq -r '.global.azureLocation' <<< "$config")"
-fi
+resource_group_name=$(jq -r '.ama.analytics.existingCoManagedResourceGroupName' <<< "$config")
+echo "Creating resource group: $resource_group_name"
+az group create --name "$resource_group_name" --location "$(jq -r '.global.azureLocation' <<< "$config")"
 
 # By default retrieve signed-in-user
 # The signed-in user will also receive all KeyVault persmissions
