@@ -186,4 +186,4 @@ output serviceProviderDatalakeName string = serviveProviderDatalake.outputs.name
 output serviceProviderDatalakeResourceId string = serviveProviderDatalake.outputs.id
 output resourceGroupName string = useExistingCoManagedResourceGroup ? analyticsExistingCoManagedRg.name : analyticsCoManagedRg.name
 output keyVaultName string = keyvault.outputs.keyVaultName
-output purviewResourceName string = (useExistingPurview) ? purview.outputs.purviewName : ''
+output purviewResourceName string = (useExistingPurview) ? purview.outputs.purviewName : last(split(purviewResourceId, '/'))
