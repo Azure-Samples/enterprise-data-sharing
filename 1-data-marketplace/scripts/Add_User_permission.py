@@ -188,7 +188,7 @@ def get_json_info(filename):
 
 ##user with high permissions ## get it from the file.
 filename = 'provision.config.template.json'
-clientId,  clientSecret = get_json_info(filename)
+client_id,  client_secret = get_json_info(filename)
 
 tenant_id= fill this
 
