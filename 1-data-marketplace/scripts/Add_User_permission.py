@@ -13,6 +13,7 @@ from msgraph.generated.service_principals.service_principals_request_builder imp
 from msgraph.generated.models.service_principal_collection_response import ServicePrincipalCollectionResponse
 import pandas as pd
 import json
+import aiohttp
 
 #### Create Functions to Add permissions.
 
@@ -62,14 +63,15 @@ async def AddPermission(credential, principal_id, resource_id, app_role_id):
     ## df021288-bdef-4463-88db-98f22de89214 (id) - User.Read.All 
     graph_client = GraphServiceClient(credential, scopes) # type: ignore
 
-    uuid_principal_id = UUID(principal_id)
-    uuid_resource_id = UUID(resource_id)
-    uuid_app_role_id = UUID(app_role_id)
+    #Conversion not necessary
+    #uuid_principal_id = UUID(principal_id)
+    #uuid_resource_id = UUID(resource_id)
+    #uuid_app_role_id = UUID(app_role_id)
 
     request_body = AppRoleAssignment(
-        principal_id=uuid_principal_id,
-        resource_id=uuid_resource_id,
-        app_role_id=uuid_app_role_id,
+        principal_id=principal_id,
+        resource_id=resource_id,
+        app_role_id=app_role_id,
     )
 
     result = await graph_client.service_principals.by_service_principal_id(principal_id).app_role_assigned_to.post(request_body)
@@ -157,23 +159,36 @@ async def add_only_permission(credential, principal_id, resource_id):
 ######################################################
 import json
 
-def get_json_info(filename):
+def get_json_info(filename, generalAdmin = 'True'):
     try:
         with open(filename, 'r') as f:
             data = json.load(f)
-        
-        # Access the client ID for GA
-        ga_client_id = data.get('ama', {}).get('generalAdmin', {}).get('identity', {})
-        
-        if ga_client_id:
-            clientId = ga_client_id.get('clientId')
-            objectId = ga_client_id.get('objectId')
-            clientSecret = ga_client_id.get('clientSecret')
-            return clientId,  clientSecret ##,objectId
+
+            tenant_id = data.get('ama', {}).get('tenantId', {})
+            print (tenant_id)
+        if generalAdmin == 'True': 
+            # Access the client ID for generalAdmin
+            ga_client_id = data.get('ama', {}).get('generalAdmin', {}).get('identity', {})
+            
+            if ga_client_id:
+                clientId = ga_client_id.get('clientId')
+                objectId = ga_client_id.get('objectId')
+                clientSecret = ga_client_id.get('clientSecret')
+                return clientId,  clientSecret, tenant_id ##,objectId
+        if generalAdmin == 'False':
+             # Access the client ID for user to receive permissions
+            ga_client_id = data.get('ama', {}).get('analytics', {}).get('identity', {})
+            
+            if ga_client_id:
+                #clientId = ga_client_id.get('clientId')
+                objectId = ga_client_id.get('objectId')
+                #clientSecret = ga_client_id.get('clientSecret')
+                return objectId, tenant_id
         else:
             raise ValueError("Client information was not found in the JSON file.")
+
     except Exception as e:
-        return None, None, None, str(e)
+        return None,  str(e)
 
 
 
@@ -188,9 +203,8 @@ def get_json_info(filename):
 
 ##user with high permissions ## get it from the file.
 filename = 'provision.config.template.json'
-client_id,  client_secret = get_json_info(filename)
-
-tenant_id= fill this
+client_id,  client_secret, tenant_id = get_json_info(filename, generalAdmin = 'True')
+principal_id, tenant_id = get_json_info(filename, generalAdmin = 'False')
 
 
 ##getting Microsoft Graph resource
@@ -198,8 +212,6 @@ resource_id =asyncio.run(main_token(tenant_id, client_id, client_secret))
 ##Credentials -> user with high permission
 credential = get_credential_auth(tenant_id, client_id, client_secret)
 
-##new user
-principal_id = ##fills this ( create a function get the SPID)
 
 ##adding only the permissions needed
 asyncio.run(add_only_permission(credential, principal_id, resource_id))
