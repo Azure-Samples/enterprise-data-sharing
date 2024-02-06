@@ -76,7 +76,7 @@ async def AddPermission(credential, principal_id, resource_id, app_role_id):
 
     result = await graph_client.service_principals.by_service_principal_id(principal_id).app_role_assigned_to.post(request_body)
     ## service principal id from the Enterprise applications - (Object ID)
-    print(result)
+    #print(result)
 
 ######################################################
 ##get the list filtered
@@ -157,7 +157,7 @@ async def add_only_permission(credential, principal_id, resource_id):
 ##File should be local in the same folder as this script
 ##strucure expected: "ama" -> "generalAdmin" -> "identity" -> 
 ######################################################
-import json
+
 
 def get_json_info(filename, generalAdmin = 'True'):
     try:
@@ -165,7 +165,7 @@ def get_json_info(filename, generalAdmin = 'True'):
             data = json.load(f)
 
             tenant_id = data.get('ama', {}).get('tenantId', {})
-            print (tenant_id)
+            #print (tenant_id)
         if generalAdmin == 'True': 
             # Access the client ID for generalAdmin
             ga_client_id = data.get('ama', {}).get('generalAdmin', {}).get('identity', {})
