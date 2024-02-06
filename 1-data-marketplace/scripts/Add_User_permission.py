@@ -132,7 +132,7 @@ async def main_token(tenant_id, client_id, client_secret):
     endpoint = 'https://graph.microsoft.com/v1.0/servicePrincipals'
     access_token = await get_credential_token(tenant_id, client_id, client_secret)
     result = await get_service_principals_token(access_token, endpoint)
-    print(result)
+    return result
 
 ######################################################
 ## Add permissions
