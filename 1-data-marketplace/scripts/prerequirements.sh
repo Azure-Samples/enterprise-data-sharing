@@ -164,3 +164,30 @@ tmp2=$(mktemp)
 jq --arg a "${sp_app_subowner_pass}" '.ama.subOwner.identity.clientSecret = $a' ./provision.config.json > "$tmp2" && mv "$tmp2" ./provision.config.json
 
 az ad group member add --group synapseSqlAdminGroup --member-id "$sp_app_subowner_object_id"
+
+#####################################################################
+# Create SP for General Admin (necessary to give Graph permissions)
+echo "Creating Service Principal for Graph Configuration"
+ sp_app_graph="graph-sp"
+ sp_app_graph_out=$(az ad sp create-for-rbac \
+     --role "User Access Administrator" \
+     --scopes "/" \
+     --name "$sp_app_graph" \
+     --output json)
+ sp_app_graph_id=$(echo "$sp_app_graph_out" | jq -r '.appId')
+ sp_app_graph_pass=$(echo "$sp_app_graph_out" | jq -r '.password')
+ sp_app_graph_tenant=$(echo "$sp_app_graph_out" | jq -r '.tenant')
+
+ sp_app_graph_object_id=$(az ad sp show --id "$sp_app_graph_id" --query id --out tsv)
+
+ echo "sp_app_graph_id: $sp_app_graph_id"
+ echo "sp_app_graph_pass: $sp_app_graph_pass"
+ echo "sp_app_graph_tenant: $sp_app_graph_tenant"
+ echo "sp_app_graph_object_id: $sp_app_graph_object_id"
+
+tmp=$(mktemp)
+jq --arg a "${sp_app_graph_id}" '.ama.generalAdmin.identity.clientId = $a' ./provision.config.json > "$tmp" && mv "$tmp" ./provision.config.json
+tmp1=$(mktemp)
+jq --arg a "${sp_app_graph_object_id}" '.ama.generalAdmin.identity.objectId = $a' ./provision.config.json > "$tmp1" && mv "$tmp1" ./provision.config.json
+tmp2=$(mktemp)
+jq --arg a "${sp_app_graph_pass}" '.ama.generalAdmin.identity.clientSecret = $a' ./provision.config.json > "$tmp2" && mv "$tmp2" ./provision.config.json
