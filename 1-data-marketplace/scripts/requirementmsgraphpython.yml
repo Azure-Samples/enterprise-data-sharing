@@ -1,4 +1,4 @@
-name: msgraphtest
+name: datasharingpermission
 channels:
   - defaults
 dependencies:
