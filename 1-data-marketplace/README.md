@@ -76,6 +76,8 @@ In order to run the automation for the Graph permissions follow the steps below:
 
       - User.Read.All
 
+      - GroupMember.Read.All
+
 ### Deploy the Managed Application
 
 To help you deploy the managed application definition and instanciate from it, we are providing a shell script that will help you. The script is located in the `scripts` folder and is called [provision.sh](./scripts/provision.sh). The script will deploy the managed application definition and instanciate from it. The script will require you to provide some parameters in a json file of which you can find a template [here](./scripts/provision.config.template.json). You will need to rename the file to `provision.config.json` and provide values for the following parameters:
