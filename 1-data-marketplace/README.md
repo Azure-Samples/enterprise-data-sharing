@@ -62,14 +62,20 @@ Furthermore, the analytics-sp requires authorization for the specified Graph API
 In order to run the automation for the Graph permissions follow the steps below:
 
 1 - Navigate to [Scripts](/enterprise-data-sharing/1-data-marketplace/scripts)
+
 2 - Run pip install -r requirements.txt
     OR
     conda env create -f requirementmsgraphpython.yml
-3 - 3 - Run [add-graph-permissions.py](/enterprise-data-sharing/1-data-marketplace/scripts/add-graph-permissions.py).
+    
+3 - Run [add-graph-permissions.py](/enterprise-data-sharing/1-data-marketplace/scripts/add-graph-permissions.py).
     This script    will be responsible to add the following permissions to the sp_graph service principal:
+
       - Applications.Read.All
+  
       - Group.Read.All
+
       - User.Read.All
+  
       - GroupMember.Read.All
 
 ### Deploy the Managed Application
