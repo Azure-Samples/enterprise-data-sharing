@@ -57,18 +57,20 @@ bash prerequirements.sh
 
 ### Graph Permissions
 
-Additionally, the analytics-sp needs to be granted to the following Graph API application permissions.
-In order to do that, manually give the sp_graph service principal created in the prerequirements.sh step General Administrator in your Entra ID.
+Furthermore, the analytics-sp requires authorization for the specified Graph API application permissions. To accomplish this, assign the General Administrator role to the sp_graph service principal created during the prerequirements.sh process within your Entra ID manually.
 
-In order tu run the automation for the Graph permissions follow the steps below:
+In order to run the automation for the Graph permissions follow the steps below:
 
-1 - Navigate to 1-data-marketpace/scripts
-2 - Run pip install -r requirements.txt OR conda env create -f requirementmsgraphpython.yml
-3 - Run add-graph-permissions.py. This script will be responsible to add the following permissions to the sp_graph service principal:
-    - Applications.Read.All
-    - Group.Read.All
-    - User.Read.All
-    - GroupMember.Read.All
+1 - Navigate to [Scripts](/enterprise-data-sharing/1-data-marketplace/scripts)
+2 - Run pip install -r requirements.txt
+    OR
+    conda env create -f requirementmsgraphpython.yml
+3 - 3 - Run [add-graph-permissions.py](/enterprise-data-sharing/1-data-marketplace/scripts/add-graph-permissions.py).
+    This script    will be responsible to add the following permissions to the sp_graph service principal:
+      - Applications.Read.All
+      - Group.Read.All
+      - User.Read.All
+      - GroupMember.Read.All
 
 ### Deploy the Managed Application
 
