@@ -68,11 +68,6 @@ async def get_credential_token(tenant_id, client_id, client_secret):
 #### Create Functions to Add permissions.
 #### - ADD Permission Function Async
 ######################################################
-    
-######################################################
-###Add permissions accordingly
-######################################################
-
 async def addpermission(credential, principal_id, resource_id, app_role_id):
 
     # scope
@@ -99,9 +94,7 @@ async def addpermission(credential, principal_id, resource_id, app_role_id):
 #### Create Functions to Add permissions.
 #### - GET REsource ID from Microsoft Graph
 ######################################################
-######################################################
-##get the list filtered
-######################################################
+
 async def get_service_principals_token(access_token, endpoint):
     # Make request to Microsoft Graph API
     headers = {
@@ -150,11 +143,9 @@ async def get_service_principals_token(access_token, endpoint):
          return None
 ##############################################################################
 #### Bridge Between Token and Graph List
-#### Depending on the get_credential_token and get_service_principals_token
+#### - Depending on the get_credential_token and get_service_principals_token
 ##############################################################################
-##############################################################################
-## get the list with the token
-##############################################################################
+
 async def main_bridge_token_resourceid(tenant_id, client_id, client_secret):
     try: 
         endpoint = 'https://graph.microsoft.com/v1.0/servicePrincipals'
@@ -164,10 +155,11 @@ async def main_bridge_token_resourceid(tenant_id, client_id, client_secret):
     except Exception as e:
         print(f"An error occurred between the token and the resourceid: {e}")
         return None
-##############################################################################
-## Add ONLY Necessary permissions - Those numnbers do not change
-### It depends on the addpermission previsouly created.
-##############################################################################
+##############################################################################################################
+## Add ONLY Necessary permissions - Those numnbers are documented as follows:
+## doc: https://learn.microsoft.com/en-us/graph/migrate-azure-ad-graph-permissions-differences#application
+### - It depends on the addpermission previsouly created.
+##############################################################################################################
 async def add_only_permission(credential, principal_id, resource_id):
     
     # Define permissions and their corresponding app_role_ids
