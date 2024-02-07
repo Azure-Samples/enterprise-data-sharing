@@ -75,8 +75,6 @@ In order to run the automation for the Graph permissions follow the steps below:
       - Group.Read.All
 
       - User.Read.All
-  
-      - GroupMember.Read.All
 
 ### Deploy the Managed Application
 
