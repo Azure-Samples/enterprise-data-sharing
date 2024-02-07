@@ -157,7 +157,7 @@ async def main_bridge_token_resourceid(tenant_id, client_id, client_secret):
         return None
 ##############################################################################################################
 ## Add ONLY Necessary permissions - Those numnbers are documented as follows:
-## doc: https://learn.microsoft.com/en-us/graph/migrate-azure-ad-graph-permissions-differences#application
+## doc: https://learn.microsoft.com/graph/migrate-azure-ad-graph-permissions-differences#application
 ### - It depends on the addpermission previsouly created.
 ##############################################################################################################
 async def add_only_permission(credential, principal_id, resource_id):
