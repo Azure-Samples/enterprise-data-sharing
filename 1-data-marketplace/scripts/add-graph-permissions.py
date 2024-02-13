@@ -8,157 +8,66 @@
 ###Libraries:
 import asyncio
 from azure.identity import ClientSecretCredential
+from azure.identity import InteractiveBrowserCredential
 from uuid import UUID
 from msgraph import GraphServiceClient
 from msgraph.generated.models.app_role_assignment import AppRoleAssignment
 from msgraph.generated.service_principals.service_principals_request_builder import ServicePrincipalsRequestBuilder
+from msgraph.generated.users.users_request_builder import UsersRequestBuilder
 from msgraph.generated.models.service_principal_collection_response import ServicePrincipalCollectionResponse
 import pandas as pd
 import json
 import aiohttp
+import asyncio
+import re
 
-######################################################
-#### Create Functions to Add permissions.
-#### - Credentials or Token
-######################################################
-######################################################
-###Get the crendentials to connect
-######################################################
-def get_credential_auth(tenant_id, client_id, client_secret):
-    
-    try: 
-    
-        credential = ClientSecretCredential(
-            tenant_id=tenant_id,
-            client_id=client_id,
-            client_secret=client_secret)
-        return credential
-    except Exception as e:
-        print(f"An error occurred while creating the credential: {e}")
-        return None
-    
 
-######################################################
-##get the token. 
-######################################################
-async def get_credential_token(tenant_id, client_id, client_secret):
-    resource = 'https://graph.microsoft.com'
-    # Acquire token using MSAL
-    authority = f'https://login.microsoftonline.com/{tenant_id}'
-    token_url = f'{authority}/oauth2/v2.0/token'
-    token_data = {
-        'grant_type': 'client_credentials',
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'scope': f'{resource}/.default'
-    }
-
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(token_url, data=token_data) as response:
-                token_response = await response.json()
-                access_token = token_response.get('access_token')
-        return access_token
-    except aiohttp.ClientError as e:
-       print(f"An error occurred: {e}")
-       return None
 
 
 ######################################################
 #### Create Functions to Add permissions.
-#### - ADD Permission Function Async
-######################################################
-async def addpermission(credential, principal_id, resource_id, app_role_id):
-
-    # scope
-    scopes = ['https://graph.microsoft.com/.default']
-
-    try:
-        ## df021288-bdef-4463-88db-98f22de89214 (id) - User.Read.All 
-        graph_client = GraphServiceClient(credential, scopes) # type: ignore
-
-
-        request_body = AppRoleAssignment(
-            principal_id=principal_id,
-            resource_id=resource_id,
-            app_role_id=app_role_id,
-        )
-
-        result = await graph_client.service_principals.by_service_principal_id(principal_id).app_role_assigned_to.post(request_body)
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
-
 
 ######################################################
 #### Create Functions to Add permissions.
 #### - GET REsource ID from Microsoft Graph
 ######################################################
 
-async def get_service_principals_token(access_token, endpoint):
-    # Make request to Microsoft Graph API
-    headers = {
-        'Authorization': f'Bearer {access_token}',
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    }
+async def list_interactive_main(credential):
 
-    query_parameters = {
-        '$filter': "displayName eq 'Microsoft Graph'",
-        '$select': 'id,displayName,appId,appRoles'
-    }
-    try: 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(endpoint, headers=headers, params=query_parameters) as response:
-                if response.status == 200:
-                    result = await response.json()
+    scopes = ['https://graph.microsoft.com/.default']
+    
+    # Initialize GraphServiceClient with the credential and scopes
+    graph_client = GraphServiceClient(credential, scopes)
+    
+    # Build query parameters
+    query_params = ServicePrincipalsRequestBuilder.ServicePrincipalsRequestBuilderGetQueryParameters(
+        select=["id"],
+        filter="displayName eq 'Microsoft Graph'", top=1
+    )
+    
+    try:
+        # Build request configuration
+        request_configuration = ServicePrincipalsRequestBuilder.ServicePrincipalsRequestBuilderGetRequestConfiguration(
+        query_parameters = query_params,
+        )
+        result = await graph_client.service_principals.get(request_configuration = request_configuration)
 
-                    service_principals = result['value']
-                    filtered_service_principals = []
-                    for item in service_principals:
-                        if item['displayName'] == 'Microsoft Graph' or any(role['displayName'] in ['Applications.Read.All', 'Group.Read.All', 'User.Read.All', 'GroupMember.Read.All'] for role in item.get('appRoles', [])):
-                            filtered_service_principals.append(item)
-                    
-                    # Extract necessary data for DataFrame
-                    service_principals_data = []
-                    for item in filtered_service_principals:
-                        service_principal_data = {
-                            'id': item['id'],
-                            'displayName': item['displayName'],
-                            'appId': item['appId'],
-                            'appRoles': item['appRoles'] if 'appRoles' in item else None
-                        }
-                        service_principals_data.append(service_principal_data)
-
-                    df = pd.DataFrame(service_principals_data)
-
-
-                    return df['id'][0]
-                else:
-                    print(f'Error: {response.status}')
-                    print(await response.text())
-                    return None
-    except aiohttp.ClientError as e:
-         print(f"An error occurred while requesting the resource_id of Microsoft Graph: {e}")
-         return None
-##############################################################################
-#### Bridge Between Token and Graph List
-#### - Depending on the get_credential_token and get_service_principals_token
-##############################################################################
-
-async def main_bridge_token_resourceid(tenant_id, client_id, client_secret):
-    try: 
-        endpoint = 'https://graph.microsoft.com/v1.0/servicePrincipals'
-        access_token = await get_credential_token(tenant_id, client_id, client_secret)
-        result = await get_service_principals_token(access_token, endpoint)
-        return result
     except Exception as e:
-        print(f"An error occurred between the token and the resourceid: {e}")
-        return None
+        print(f"An error occurred while requesting the resource_id: {e}")
+    
+    ## From the string results extract only the resource_id
+    result_str =str(result)
+    match = re.search(r"id='(.+?)'", result_str)
+
+    if match:
+        resource_id = match.group(1)
+    else:
+        print("Resource_id is not found in the string")
+    return resource_id
+  
 ##############################################################################################################
 ## Add ONLY Necessary permissions - Those numnbers are documented as follows:
 ## doc: https://learn.microsoft.com/graph/migrate-azure-ad-graph-permissions-differences#application
-### - It depends on the addpermission previsouly created.
 ##############################################################################################################
 async def add_only_permission(credential, principal_id, resource_id):
     
@@ -172,7 +81,33 @@ async def add_only_permission(credential, principal_id, resource_id):
     try:
 
         for permission, app_role_id in permissions.items():
-            await addpermission(credential, principal_id, resource_id, app_role_id)
+            #await addpermission(credential, principal_id, resource_id, app_role_id)
+             # scope
+            scopes = ['https://graph.microsoft.com/.default']
+
+            try:
+                ## df021288-bdef-4463-88db-98f22de89214 (id) - User.Read.All 
+                graph_client = GraphServiceClient(credential, scopes) # type: ignore
+                
+                request_body = AppRoleAssignment(
+                    principal_id=UUID(principal_id),
+                    resource_id=UUID(resource_id),
+                    app_role_id=UUID(app_role_id),
+                )
+
+                result = await graph_client.service_principals.by_service_principal_id(principal_id).app_role_assigned_to.post(request_body)
+            except Exception as e:
+                ##retry once in case this specific failure happens
+                if "'NoneType' object has no attribute 'send'"  in str(e):
+                    request_body = AppRoleAssignment(
+                    principal_id=UUID(principal_id),
+                    resource_id=UUID(resource_id),
+                    app_role_id=UUID(app_role_id),
+                    )
+
+                    result = await graph_client.service_principals.by_service_principal_id(principal_id).app_role_assigned_to.post(request_body)
+                else:
+                    print(f"An error occurred: {e}")
     except Exception as e:
         print(f"An error occurred while adding one of the following permissions Applications.Read.All,Group.Read.All,User.Read.All,GroupMember.Read.All): {e}")
         return None
@@ -180,37 +115,30 @@ async def add_only_permission(credential, principal_id, resource_id):
 ###########################################################################################
 ## Return user with high permission from the file 'provision.config.template.json'
 ##File should be local in the same folder as this script
-##strucure expected: "ama" -> "generalAdmin" -> "identity" -> Generaladmin=true
-##strucure expected: "ama" -> "analytics" -> "identity" -> Generaladmin=False
+##strucure expected: "ama" -> "analytics" -> "identity" -> "clientId", "objectId", "clientSecret"
+    ##"clientId" --> Client ID from App registration
+    ##"objectId" --> Enterprise App Objectid
 ###########################################################################################
-def get_json_info(filename, generalAdmin = 'True'):
+def get_json_info(filename):
     try:
         with open(filename, 'r') as f:
             data = json.load(f)
 
             tenant_id = data.get('ama', {}).get('tenantId', {})
             
-        if generalAdmin == 'True': 
-            # Access the client ID for generalAdmin
-            ga_client_id = data.get('ama', {}).get('generalAdmin', {}).get('identity', {})
+            # Access the client ID for user to receive permissions
+            ga_client_id = data.get('ama', {}).get('analytics', {}).get('identity', {})
             
             if ga_client_id:
                 clientId = ga_client_id.get('clientId')
                 objectId = ga_client_id.get('objectId')
                 clientSecret = ga_client_id.get('clientSecret')
-                return clientId,  clientSecret, tenant_id 
-        if generalAdmin == 'False':
-             # Access the client ID for user to receive permissions
-            ga_client_id = data.get('ama', {}).get('analytics', {}).get('identity', {})
-            
-            if ga_client_id:
-                objectId = ga_client_id.get('objectId')
-                return objectId, tenant_id
-        else:
-            raise ValueError("Client information was not found in the JSON file.")
+                return clientId,objectId, clientSecret, tenant_id 
+            else:
+                raise ValueError("Client information was not found in the JSON file.")
 
     except Exception as e:
-        return None,  str(e)
+        return  str(e)
 
 
 
@@ -220,18 +148,22 @@ def get_json_info(filename, generalAdmin = 'True'):
 ##########################################################
 ###Flow
 
+######################################################
+##user with admin permissions
+######################################################
+credential = InteractiveBrowserCredential()
+scopes=['https://graph.microsoft.com/.default']
+client = GraphServiceClient(credentials=credential, scopes=scopes,)
+
 
 ## 1 - Read Config File
 filename = 'provision.config.template.json'
-client_id,  client_secret, tenant_id = get_json_info(filename, generalAdmin = 'True')
-principal_id, tenant_id = get_json_info(filename, generalAdmin = 'False')
+client_id,principal_id,clientSecret, tenant_id = get_json_info(filename)
 
-
-### 2 - Get resource id and Credentials
-resource_id =asyncio.run(main_bridge_token_resourceid(tenant_id, client_id, client_secret))
-##Credentials -> user with high permission
-credential = get_credential_auth(tenant_id, client_id, client_secret)
+## 2 - Get resource id and Credentials
+resource_id =resource_id = asyncio.run(list_interactive_main(credential))
 
 
 ## 3 - adding only the permissions needed
 asyncio.run(add_only_permission(credential, principal_id, resource_id))
+
