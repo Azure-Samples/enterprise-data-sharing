@@ -78,7 +78,8 @@ To execute the automation for managing Graph permissions, follow these steps. Yo
 
 
 
-After executing this script, you just need to authorize administrative permissions for the user specified in the JSON file provision.config. The user can be identified either by their Object ID (for enterprise app) or Client ID (for app registration) located within the "ama" -> "analytics" -> "identity" section. Admin permissions can be granted through either the App Registrations section in the Azure Portal or the Enterprise App section in the Microsoft Entra Admin, Fig 1 - Permission, illustrates this. For more details at the Microsoft docs.
+After executing this script, you just need to authorize administrative permissions for the user specified in the JSON file provision.config. The user can be identified either by their Object ID (for enterprise app) or Client ID (for app registration) located within the "ama" -> "analytics" -> "identity" section. Admin permissions can be granted through either the App Registrations section in the Azure Portal or the Enterprise App section in the Microsoft Entra Admin, bellow Fig 1 - Permission, illustrates this. 
+For more details look at the Microsoft docs.
 
 Docs: [Grant Admin](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent?pivots=portal#grant-tenant-wide-admin-consent-in-enterprise-apps-pane)
 
