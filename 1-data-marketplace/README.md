@@ -84,6 +84,7 @@ Docs: [Grant Admin](https://learn.microsoft.com/en-us/entra/identity/enterprise-
 
 
 ![Fig 1 - Permission](../images/eds-repo-user-permission-readme.jpg)
+
 Fig 1 - Permission
 
 
