@@ -57,9 +57,7 @@ bash prerequirements.sh
 
 ### Graph Permissions
 
-Furthermore, the analytics-sp requires authorization for the specified Graph API application permissions. To accomplish this, assign the Global Administrator role to the sp_graph service principal created during the prerequirements.sh process within your Entra ID manually.
-
-In order to run the automation for the Graph permissions follow the steps below:
+To execute the automation for managing Graph permissions, follow these steps. You will need to authenticate via the browser the first time this script runs. Please note that administrative permissions within the tenant are required.:
 
 1 - Navigate to [Scripts](/enterprise-data-sharing/1-data-marketplace/scripts)
 
@@ -77,6 +75,19 @@ In order to run the automation for the Graph permissions follow the steps below:
       - User.Read.All
 
       - GroupMember.Read.All
+
+
+
+After executing this script, you just need to authorize administrative permissions for the user specified in the JSON file provision.config. The user can be identified either by their Object ID (for enterprise app) or Client ID (for app registration) located within the "ama" -> "analytics" -> "identity" section. Admin permissions can be granted through either the App Registrations section in the Azure Portal or the Enterprise App section in the Microsoft Entra Admin, bellow Fig 1 - Permission, illustrates this. 
+For more details look at the Microsoft docs.
+
+Docs: [Grant Admin](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent?pivots=portal#grant-tenant-wide-admin-consent-in-enterprise-apps-pane)
+
+
+![Fig 1 - Permission](../images/eds-repo-user-permission-readme.jpg)
+
+Fig 1 - Permission
+
 
 ### Deploy the Managed Application
 
